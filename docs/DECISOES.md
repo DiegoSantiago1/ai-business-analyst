@@ -27,3 +27,11 @@ Cada decisão com o motivo e a alternativa descartada. "Escolha do Diego" = resp
 **D11. Teto de 90 h.** Escolha do Diego. Primeiro corte: gráfico no chat e tamanho da avaliação.
 
 **D12. Ficar no Groq gratuito, com aviso de cota esgotada.** Escolha do Diego (04/10/2026). A conta estimada (~5–7 mil tokens por pergunta) cabe no limite diário, porque os testes não chamam a API e a avaliação tem orçamento. Quando a cota acaba, a interface avisa em vez de quebrar. O plano pago fica para depois, só se for preciso.
+
+**D13. Travas no próprio usuário da IA, com os privilégios como garantia.** O `analista_ia` já nasce com `default_transaction_read_only = on`, `statement_timeout = 5s`, `idle_in_transaction_session_timeout = 10s`, `search_path = ia` e `CONNECTION LIMIT 5` (`db/bootstrap.sql`). Esses padrões valem mesmo se a API esquecer de configurar a sessão, mas o próprio usuário consegue mudá-los com `SET`. Por isso a garantia de verdade é ele só ter `USAGE` no schema `ia` (e, a partir da fase 3, `SELECT` view por view), sem `TEMP` nem `CREATE` em lugar nenhum. Há um teste que desliga o somente leitura de propósito e confere que os privilégios ainda barram cada escrita (`tests/test_permissoes.py`). Também foi conferido que o teste falha se um `GRANT CREATE` for dado por engano.
+
+**D14. A API roda TypeScript direto no Node 24, sem `tsx` e sem build.** O Node 24 apaga os tipos ao carregar o arquivo ("type stripping"), medido em 04/10/2026, sem aviso, inclusive no `node --test`. O `tsc` fica só como verificador de tipos (`noEmit`), com `erasableSyntaxOnly` (nada de `enum` nem `namespace`) e imports com extensão `.ts`. Descartados: `tsx` (usado nos Projetos 1 e 2; uma dependência a mais) e compilar para `dist/` (um passo a mais no CI e no deploy).
+
+**D15. A API só conhece a senha do usuário da IA.** O `api/src/config.ts` lê `ANALISTA_IA_USER`/`ANALISTA_IA_PASSWORD` e recusa subir se o usuário da IA for o dono ou o grupo. A senha do dono nunca é lida pela API: mesmo que a IA seja enganada, a API não tem credencial com mais privilégio.
+
+**D16. Repositório privado desde a fase 1.** Escolha do Diego (04/10/2026). O CI testa cada commit desde o começo e o código tem cópia fora do OneDrive. Fica público só no fim, com pedido explícito dele.

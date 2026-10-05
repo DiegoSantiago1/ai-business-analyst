@@ -5,8 +5,8 @@
 | Fase | Situação |
 |---|---|
 | 0 Grill + medições | Feita (04/10/2026) |
-| 1 Fundação | Em andamento |
-| 2 Dados fictícios | Pendente |
+| 1 Fundação | Feita (04/10/2026): bootstrap, migration 0001, API Node/TS, CI verde |
+| 2 Dados fictícios | Próxima |
 | 3 Camada semântica (métricas) | Pendente |
 | 4 Núcleo de IA (ferramentas + travas) | Pendente |
 | 5 API HTTP | Pendente |
