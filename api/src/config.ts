@@ -90,3 +90,28 @@ export function carregarConfigBanco(
     Object.defineProperty(config, "senha", { value: v.ANALISTA_IA_PASSWORD, enumerable: false }),
   ) as ConfigBanco;
 }
+
+// --------------------------------------------------------------------------- IA
+
+const esquemaIA = z.object({
+  GROQ_API_KEY: z.string().trim().min(1),
+  // Só modelos "production" do Groq (D4); o padrão economiza a cota do 120b (D12).
+  GROQ_MODELO: z.enum(["openai/gpt-oss-20b", "openai/gpt-oss-120b"]).default("openai/gpt-oss-20b"),
+  GROQ_ESFORCO: z.enum(["low", "medium", "high"]).default("low"),
+});
+
+export interface ConfigIA {
+  readonly modelo: "openai/gpt-oss-20b" | "openai/gpt-oss-120b";
+  readonly esforco: "low" | "medium" | "high";
+  readonly chave: string;
+}
+
+export function carregarConfigIA(env: Ambiente = lerAmbiente()): ConfigIA {
+  const resultado = esquemaIA.safeParse(env);
+  if (!resultado.success) throw erroDeValidacao(resultado.error);
+  const v = resultado.data;
+  const config = { modelo: v.GROQ_MODELO, esforco: v.GROQ_ESFORCO };
+  return Object.freeze(
+    Object.defineProperty(config, "chave", { value: v.GROQ_API_KEY, enumerable: false }),
+  ) as ConfigIA;
+}
