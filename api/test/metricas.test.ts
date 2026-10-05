@@ -151,3 +151,15 @@ test("catálogo para o prompt cita todas as métricas e marca as de meta", () =>
   assert.match(texto, /ticket_medio \(R\$\)/);
   assert.match(texto, /atingimento_meta_pct \(%\).*\[só loja\/mes\/ano\]/);
 });
+
+test("ordenar_por aceita a dimensão agrupada", () => {
+  const { sql } = montarConsulta(
+    { ...BASE, agrupar_por: ["mes"], ordenar_por: "mes", ordem: "asc" },
+    VALORES,
+  );
+  assert.match(sql, /ORDER BY mes ASC NULLS LAST, mes/);
+  assert.throws(
+    () => montarConsulta({ ...BASE, ordenar_por: "loja" }, VALORES),
+    /metricas ou agrupar_por/,
+  );
+});

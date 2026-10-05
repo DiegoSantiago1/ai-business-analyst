@@ -266,3 +266,18 @@ test("output_parse_failed (texto em vez de ferramenta) vira resposta de texto", 
   assert.equal(r.mensagem.content, "Must refuse.");
   assert.equal(r.mensagem.tool_calls, undefined);
 });
+
+test("espera preventiva só pelo déficit (taxa = limite / 60 s), não até encher tudo", async () => {
+  const { cliente, esperas } = clienteCom([
+    resposta(200, OK, {
+      "x-ratelimit-remaining-tokens": "100",
+      "x-ratelimit-reset-tokens": "55s",
+      "x-ratelimit-limit-tokens": "8000",
+    }),
+    resposta(200, OK),
+  ]);
+  await cliente.completar(PEDIDO);
+  await cliente.completar(PEDIDO);
+  const [espera] = esperas;
+  assert.ok(espera !== undefined && espera > 1000 && espera < 12_000, `esperou ${espera} ms`);
+});

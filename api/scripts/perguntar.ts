@@ -21,14 +21,23 @@ try {
   // --depurar: mostra o corpo de toda resposta de erro do Groq (ex.: failed_generation).
   const depurar: typeof fetch = async (url, init) => {
     const r = await fetch(url, init);
-    if (!r.ok) console.error(`[groq ${r.status}]`, await r.clone().text());
+    const restantes = r.headers.get("x-ratelimit-remaining-tokens");
+    const reinicia = r.headers.get("x-ratelimit-reset-tokens");
+    console.error(
+      `[groq ${r.status}] restantes=${restantes} reinicia=${reinicia} retry-after=${r.headers.get("retry-after")}`,
+    );
+    if (!r.ok) console.error(await r.clone().text());
     return r;
+  };
+  const esperarDepurando = async (ms: number) => {
+    console.error(`[espera ${ms} ms]`);
+    await new Promise((resolver) => setTimeout(resolver, ms));
   };
   const provedor = new ClienteGroq({
     chave: ia.chave,
     modelo: ia.modelo,
     esforco: ia.esforco,
-    ...(process.argv.includes("--depurar") ? { fetch: depurar } : {}),
+    ...(process.argv.includes("--depurar") ? { fetch: depurar, esperar: esperarDepurando } : {}),
   });
   const contexto = { pool, vocabulario: await carregarVocabulario(pool) };
   const r = await perguntar(pergunta, provedor, contexto);

@@ -22,7 +22,9 @@ export const esquemaResposta = z
           })
           .strict(),
       )
-      .max(8)
+      .max(60)
+      // Cabem 12 cartões na tela; o resto continua na tabela (que vem do banco).
+      .transform((numeros) => numeros.slice(0, 12))
       // Resposta sem número nenhum (ex.: "quem foi o último cliente?") é válida.
       .default([]),
     // O modelo às vezes manda o gráfico como texto: só o tipo ("nenhum") ou o objeto em
@@ -117,4 +119,21 @@ export function validarGrafico(
   if (!x || !y || !tabela.colunas.includes(x) || !tabela.colunas.includes(y)) return undefined;
   if (!tabela.linhas.every((l) => typeof l[y] === "number")) return undefined;
   return { tipo: pedido.tipo, x, y };
+}
+
+/**
+ * Gráfico deduzido quando a IA não disse nada sobre gráfico (se ela disse "nenhum", vale o
+ * "nenhum"). Só nos casos óbvios: 2 a 30 linhas, UMA coluna de rótulo e ao menos uma
+ * numérica. Mês ou data vira linha; o resto, barras.
+ */
+export function inferirGrafico(tabela: Tabela | undefined): Grafico | undefined {
+  if (!tabela || tabela.linhas.length < 2 || tabela.linhas.length > 30) return undefined;
+  const numerica = (c: string) =>
+    c !== "ano" && tabela.linhas.every((l) => typeof l[c] === "number");
+  const numericas = tabela.colunas.filter(numerica);
+  const rotulos = tabela.colunas.filter((c) => !numerica(c));
+  const [x] = rotulos;
+  const [y] = numericas;
+  if (rotulos.length !== 1 || !x || !y) return undefined;
+  return { tipo: x === "mes" || x === "data" ? "linha" : "barra", x, y };
 }

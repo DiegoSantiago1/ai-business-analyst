@@ -16,6 +16,7 @@ import {
   conferir,
   esquemaResposta,
   type Grafico,
+  inferirGrafico,
   type NumeroConferido,
   numerosDosResultados,
   type Tabela,
@@ -177,7 +178,8 @@ function validarResposta(argumentos: string, passos: Passo[]): Validacao {
   const doBanco = numerosDosResultados(passos);
   const tabela = ultimaTabela(passos);
   const { resposta, numeros, grafico, limitacoes } = lido.data;
-  const graficoValido = validarGrafico(grafico, tabela);
+  // Sem pedido de gráfico: deduz um quando o formato da tabela é óbvio.
+  const graficoValido = grafico ? validarGrafico(grafico, tabela) : inferirGrafico(tabela);
   return {
     ok: true,
     valor: {

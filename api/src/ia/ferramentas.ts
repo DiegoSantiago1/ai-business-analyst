@@ -53,7 +53,7 @@ export const FERRAMENTAS: DefinicaoFerramenta[] = [
             description: 'Ex.: {"loja":["Loja Sul"],"forma_pagamento":["Consorcio"]}',
             properties: Object.fromEntries(DIMENSOES_FILTRAVEIS.map((d) => [d, textos])),
           },
-          ordenar_por: { type: "string", enum: NOMES_METRICAS },
+          ordenar_por: { type: "string", enum: [...NOMES_METRICAS, ...NOMES_DIMENSOES] },
           ordem: { type: "string", enum: ["desc", "asc"] },
           limite: { type: "integer", minimum: 1, maximum: 100 },
         },
@@ -95,7 +95,8 @@ export const FERRAMENTAS: DefinicaoFerramenta[] = [
           resposta: { type: "string", description: "1 a 4 frases, em português" },
           numeros: {
             type: "array",
-            maxItems: 8,
+            // Sem maxItems: o Groq recusaria a chamada inteira (medido: o modelo quis 12
+            // números numa série mensal). A API corta em 12 (resposta.ts).
             description: "Números citados, copiados exatamente das ferramentas",
             items: {
               type: "object",

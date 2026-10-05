@@ -120,6 +120,8 @@ export class ClienteGroq implements ProvedorIA {
   readonly #o: Required<Omit<OpcoesGroq, "chave" | "modelo">>;
   /** Último estado do limite por minuto, lido dos cabeçalhos. */
   #restantes: number | undefined;
+  #limitePorMinuto: number | undefined;
+  #lidoEm = 0;
   #reiniciaEm = 0;
 
   constructor(opcoes: OpcoesGroq) {
@@ -168,9 +170,9 @@ export class ClienteGroq implements ProvedorIA {
 
     while (erros < TENTATIVAS_DE_ERRO) {
       // Espera preventiva: o balde do minuto não tem tokens para este pedido.
-      const faltaMs = this.#reiniciaEm - this.#o.agora();
-      if (this.#restantes !== undefined && this.#restantes < necessarios && faltaMs > 0) {
-        await esperar(faltaMs / 1000 + 0.25, "espera preventiva");
+      const espera = this.#esperaPreventiva(necessarios);
+      if (espera > 0) {
+        await esperar(espera + 0.25, "espera preventiva");
         this.#restantes = undefined;
       }
 
@@ -256,12 +258,32 @@ export class ClienteGroq implements ProvedorIA {
     );
   }
 
+  /**
+   * Segundos até o balde do minuto ter tokens para o pedido. O balde enche aos poucos
+   * (limite/60 por segundo): espera só o déficit, e não até encher por completo (o
+   * x-ratelimit-reset-tokens é o tempo até encher tudo; usá-lo fazia esperar ~50 s à toa).
+   */
+  #esperaPreventiva(necessarios: number): number {
+    if (this.#restantes === undefined) return 0;
+    const agora = this.#o.agora();
+    const ateEncher = (this.#reiniciaEm - agora) / 1000;
+    if (ateEncher <= 0) return 0;
+    const taxa = (this.#limitePorMinuto ?? 0) / 60;
+    const disponiveis = this.#restantes + (taxa * (agora - this.#lidoEm)) / 1000;
+    if (disponiveis >= necessarios) return 0;
+    if (taxa <= 0) return ateEncher;
+    return Math.min(ateEncher, (necessarios - disponiveis) / taxa);
+  }
+
   #lerCabecalhos(cabecalhos: Headers): void {
     const restantes = Number(cabecalhos.get("x-ratelimit-remaining-tokens"));
     const reinicia = lerDuracao(cabecalhos.get("x-ratelimit-reset-tokens"));
     if (Number.isFinite(restantes) && cabecalhos.has("x-ratelimit-remaining-tokens")) {
       this.#restantes = restantes;
-      this.#reiniciaEm = this.#o.agora() + (reinicia ?? 60) * 1000;
+      this.#lidoEm = this.#o.agora();
+      this.#reiniciaEm = this.#lidoEm + (reinicia ?? 60) * 1000;
+      const limite = Number(cabecalhos.get("x-ratelimit-limit-tokens"));
+      if (Number.isFinite(limite) && limite > 0) this.#limitePorMinuto = limite;
     }
   }
 }

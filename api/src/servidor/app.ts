@@ -69,7 +69,8 @@ function cabecalhosDeSeguranca(_req: Request, res: Response, next: NextFunction)
   res.setHeader("Referrer-Policy", "no-referrer");
   res.setHeader(
     "Content-Security-Policy",
-    "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'",
+    // Fontes do Google: o CSS vem de fonts.googleapis.com e os arquivos de fonts.gstatic.com.
+    "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'",
   );
   next();
 }

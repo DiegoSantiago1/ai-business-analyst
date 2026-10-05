@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { conferir, esquemaResposta, validarGrafico } from "../src/ia/resposta.ts";
+import { conferir, esquemaResposta, inferirGrafico, validarGrafico } from "../src/ia/resposta.ts";
 
 const BASE = { resposta: "ok", numeros: [] };
 
@@ -75,4 +75,47 @@ test("validarGrafico exige colunas existentes, y numérico e 2 linhas", () => {
 
 test("numeros é opcional (resposta sem número)", () => {
   assert.deepEqual(esquemaResposta.parse({ resposta: "O cliente foi Fulano." }).numeros, []);
+});
+
+test("inferirGrafico: só nos casos óbvios", () => {
+  const tabela = (colunas: string[], linhas: Record<string, unknown>[]) => ({
+    colunas,
+    linhas,
+    sql: "",
+    truncado: false,
+  });
+  const lojas = tabela(
+    ["loja", "unidades"],
+    [
+      { loja: "A", unidades: 1 },
+      { loja: "B", unidades: 2 },
+    ],
+  );
+  assert.deepEqual(inferirGrafico(lojas), { tipo: "barra", x: "loja", y: "unidades" });
+  const meses = tabela(
+    ["mes", "faturamento"],
+    [
+      { mes: "2026-01-01", faturamento: 1 },
+      { mes: "2026-02-01", faturamento: 2 },
+    ],
+  );
+  assert.deepEqual(inferirGrafico(meses), { tipo: "linha", x: "mes", y: "faturamento" });
+  const anos = tabela(
+    ["ano", "unidades"],
+    [
+      { ano: 2025, unidades: 1 },
+      { ano: 2026, unidades: 2 },
+    ],
+  );
+  assert.deepEqual(inferirGrafico(anos), { tipo: "barra", x: "ano", y: "unidades" });
+  const duasDimensoes = tabela(
+    ["ano", "loja", "unidades"],
+    [
+      { ano: 2025, loja: "A", unidades: 1 },
+      { ano: 2026, loja: "A", unidades: 2 },
+    ],
+  );
+  assert.equal(inferirGrafico(duasDimensoes), undefined);
+  assert.equal(inferirGrafico(tabela(["unidades"], [{ unidades: 1 }])), undefined);
+  assert.equal(inferirGrafico(undefined), undefined);
 });

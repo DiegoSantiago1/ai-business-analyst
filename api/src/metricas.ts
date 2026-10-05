@@ -129,7 +129,8 @@ export const esquemaPedido = z
         z.array(z.string().min(1).max(80)).min(1).max(20),
       )
       .default({}),
-    ordenar_por: z.enum(NOMES_METRICAS).optional(),
+    // Métrica pedida ou dimensão agrupada ("ordenar_por: mes" é um pedido natural do modelo).
+    ordenar_por: z.enum([...NOMES_METRICAS, ...NOMES_DIMENSOES]).optional(),
     ordem: z.enum(["desc", "asc"]).default("desc"),
     limite: z.number().int().min(1).max(100).default(50),
   })
@@ -217,8 +218,11 @@ export function montarConsulta(entrada: unknown, valores: Valores): ConsultaMont
       );
     }
   }
-  if (p.ordenar_por && !metricas.includes(p.ordenar_por)) {
-    throw new ErroFerramenta(`ordenar_por "${p.ordenar_por}" precisa estar em metricas.`);
+  const ordenavel = [...metricas, ...dimensoes] as string[];
+  if (p.ordenar_por && !ordenavel.includes(p.ordenar_por)) {
+    throw new ErroFerramenta(
+      `ordenar_por "${p.ordenar_por}" precisa estar em metricas ou agrupar_por.`,
+    );
   }
 
   const parametros: unknown[] = [];
