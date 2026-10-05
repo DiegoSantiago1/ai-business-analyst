@@ -1,0 +1,321 @@
+{
+ "modelo": "openai/gpt-oss-20b",
+ "inicio": "2026-10-05T03:18:36.879961+00:00",
+ "itens": [
+  {
+   "id": "c06",
+   "tipo": "comparacao",
+   "pergunta": "Qual loja tem a maior proporção de SUVs nas suas próprias vendas?",
+   "esperado": [
+    [
+     "Loja Serra"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Qual loja tem a maior proporção de SUVs nas suas próprias vendas?",
+    "resposta": "A loja com a maior proporção de SUVs nas suas próprias vendas é a Loja Serra, com 73,6 % de SUVs em relação ao total de unidades vendidas na loja.",
+    "numeros": [
+     {
+      "rotulo": "Proporção de SUVs na Loja Serra",
+      "valor": 73.6,
+      "unidade": "%",
+      "conferido": true
+     },
+     {
+      "rotulo": "Proporção de SUVs na Loja Centro",
+      "valor": 56.7,
+      "unidade": "%",
+      "conferido": true
+     },
+     {
+      "rotulo": "Proporção de SUVs na Loja Norte",
+      "valor": 56.3,
+      "unidade": "%",
+      "conferido": true
+     },
+     {
+      "rotulo": "Proporção de SUVs na Loja Litoral",
+      "valor": 55.3,
+      "unidade": "%",
+      "conferido": true
+     },
+     {
+      "rotulo": "Proporção de SUVs na Loja Sul",
+      "valor": 54.2,
+      "unidade": "%",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "loja",
+      "categoria",
+      "participacao_unidades_pct"
+     ],
+     "linhas": [
+      {
+       "loja": "Loja Serra",
+       "categoria": "SUV",
+       "participacao_unidades_pct": 73.6
+      },
+      {
+       "loja": "Loja Centro",
+       "categoria": "SUV",
+       "participacao_unidades_pct": 56.7
+      },
+      {
+       "loja": "Loja Norte",
+       "categoria": "SUV",
+       "participacao_unidades_pct": 56.3
+      },
+      {
+       "loja": "Loja Litoral",
+       "categoria": "SUV",
+       "participacao_unidades_pct": 55.3
+      },
+      {
+       "loja": "Loja Sul",
+       "categoria": "SUV",
+       "participacao_unidades_pct": 54.2
+      }
+     ],
+     "sql": "SELECT loja, categoria, round(100.0 * sum(quantidade) / sum(sum(quantidade)) OVER (PARTITION BY loja), 1) AS participacao_unidades_pct\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nGROUP BY loja, categoria\nORDER BY participacao_unidades_pct DESC NULLS LAST, loja, categoria\nLIMIT $3",
+     "truncado": false
+    },
+    "grafico": {
+     "tipo": "barra",
+     "x": "loja",
+     "y": "participacao_unidades_pct"
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [
+        "loja"
+       ],
+       "ate": "2026-09-30",
+       "de": "2024-10-01",
+       "filtros": {
+        "categoria": [
+         "SUV"
+        ]
+       },
+       "limite": 5,
+       "metricas": [
+        "participacao_unidades_pct"
+       ],
+       "ordem": "desc",
+       "ordenar_por": "participacao_unidades_pct"
+      },
+      "sql": "SELECT loja, round(100.0 * sum(quantidade) / sum(sum(quantidade)) OVER (), 1) AS participacao_unidades_pct\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date AND categoria = ANY($3::text[])\nGROUP BY loja\nORDER BY participacao_unidades_pct DESC NULLS LAST, loja\nLIMIT $4",
+      "parametros": [
+       "2024-10-01",
+       "2026-09-30",
+       [
+        "SUV"
+       ],
+       5
+      ],
+      "colunas": [
+       "loja",
+       "participacao_unidades_pct"
+      ],
+      "linhas": [
+       {
+        "loja": "Loja Centro",
+        "participacao_unidades_pct": 29.9
+       },
+       {
+        "loja": "Loja Norte",
+        "participacao_unidades_pct": 21.9
+       },
+       {
+        "loja": "Loja Sul",
+        "participacao_unidades_pct": 17.5
+       },
+       {
+        "loja": "Loja Serra",
+        "participacao_unidades_pct": 16.6
+       },
+       {
+        "loja": "Loja Litoral",
+        "participacao_unidades_pct": 14.1
+       }
+      ],
+      "totalLinhas": 5,
+      "truncado": false,
+      "duracaoMs": 26,
+      "aviso": "participação aqui = fatia de cada loja no total filtrado (categoria). Para o % de cada categoria DENTRO de cada loja, use agrupar_por [loja, categoria] sem esse filtro."
+     },
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [
+        "loja",
+        "categoria"
+       ],
+       "ate": "2026-09-30",
+       "de": "2024-10-01",
+       "filtros": {
+        "categoria": [
+         "SUV"
+        ]
+       },
+       "limite": 5,
+       "metricas": [
+        "participacao_unidades_pct"
+       ],
+       "ordem": "desc",
+       "ordenar_por": "participacao_unidades_pct"
+      },
+      "sql": "SELECT loja, categoria, round(100.0 * sum(quantidade) / sum(sum(quantidade)) OVER (PARTITION BY loja), 1) AS participacao_unidades_pct\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date AND categoria = ANY($3::text[])\nGROUP BY loja, categoria\nORDER BY participacao_unidades_pct DESC NULLS LAST, loja, categoria\nLIMIT $4",
+      "parametros": [
+       "2024-10-01",
+       "2026-09-30",
+       [
+        "SUV"
+       ],
+       5
+      ],
+      "colunas": [
+       "loja",
+       "categoria",
+       "participacao_unidades_pct"
+      ],
+      "linhas": [
+       {
+        "loja": "Loja Centro",
+        "categoria": "SUV",
+        "participacao_unidades_pct": 100
+       },
+       {
+        "loja": "Loja Litoral",
+        "categoria": "SUV",
+        "participacao_unidades_pct": 100
+       },
+       {
+        "loja": "Loja Norte",
+        "categoria": "SUV",
+        "participacao_unidades_pct": 100
+       },
+       {
+        "loja": "Loja Serra",
+        "categoria": "SUV",
+        "participacao_unidades_pct": 100
+       },
+       {
+        "loja": "Loja Sul",
+        "categoria": "SUV",
+        "participacao_unidades_pct": 100
+       }
+      ],
+      "totalLinhas": 5,
+      "truncado": false,
+      "duracaoMs": 20
+     },
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [
+        "loja",
+        "categoria"
+       ],
+       "ate": "2026-09-30",
+       "de": "2024-10-01",
+       "limite": 5,
+       "metricas": [
+        "participacao_unidades_pct"
+       ],
+       "ordem": "desc",
+       "ordenar_por": "participacao_unidades_pct"
+      },
+      "sql": "SELECT loja, categoria, round(100.0 * sum(quantidade) / sum(sum(quantidade)) OVER (PARTITION BY loja), 1) AS participacao_unidades_pct\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nGROUP BY loja, categoria\nORDER BY participacao_unidades_pct DESC NULLS LAST, loja, categoria\nLIMIT $3",
+      "parametros": [
+       "2024-10-01",
+       "2026-09-30",
+       5
+      ],
+      "colunas": [
+       "loja",
+       "categoria",
+       "participacao_unidades_pct"
+      ],
+      "linhas": [
+       {
+        "loja": "Loja Serra",
+        "categoria": "SUV",
+        "participacao_unidades_pct": 73.6
+       },
+       {
+        "loja": "Loja Centro",
+        "categoria": "SUV",
+        "participacao_unidades_pct": 56.7
+       },
+       {
+        "loja": "Loja Norte",
+        "categoria": "SUV",
+        "participacao_unidades_pct": 56.3
+       },
+       {
+        "loja": "Loja Litoral",
+        "categoria": "SUV",
+        "participacao_unidades_pct": 55.3
+       },
+       {
+        "loja": "Loja Sul",
+        "categoria": "SUV",
+        "participacao_unidades_pct": 54.2
+       }
+      ],
+      "totalLinhas": 5,
+      "truncado": false,
+      "duracaoMs": 21
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-20b",
+     "versaoPrompt": "v4",
+     "voltas": 4,
+     "tokensEntrada": 9175,
+     "tokensSaida": 887,
+     "tokensTotal": 10062,
+     "latenciaMs": 8784,
+     "esperaCotaMs": 5688
+    }
+   }
+  }
+ ],
+ "banco_antes": "262586276cd78911363da7e5b91f5004:2186a0046cec09ec8e5010eb44dca29efd82bf685690c35bce796918ca6ae4e68",
+ "banco_depois": "262586276cd78911363da7e5b91f5004:2186a0046cec09ec8e5010eb44dca29efd82bf685690c35bce796918ca6ae4e68",
+ "banco_intacto": true,
+ "fim": "2026-10-05T03:18:45.773114+00:00",
+ "resumo": {
+  "perguntas": 1,
+  "acertos": 1,
+  "taxa_acerto": 100.0,
+  "por_tipo": {
+   "comparacao": {
+    "total": 1,
+    "acertos": 1
+   }
+  },
+  "latencia_ms": {
+   "p50": 8784,
+   "p95": 8784
+  },
+  "tokens": {
+   "media": 10062.0,
+   "total": 10062
+  },
+  "voltas_media": 4.0,
+  "numeros_citados": 5,
+  "numeros_conferidos_pct": 100.0,
+  "ferramentas": {
+   "consultar_metrica": 3
+  }
+ }
+}
