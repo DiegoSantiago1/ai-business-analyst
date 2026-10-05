@@ -133,7 +133,7 @@ tipo = "comparacao"
 pergunta = "Vendemos mais carros de janeiro a setembro de 2026 do que no mesmo período de 2025? Quantos em cada ano?"
 sql = "SELECT sum(quantidade) FILTER (WHERE ano = 2026), sum(quantidade) FILTER (WHERE ano = 2025) FROM ia.vendas WHERE extract(month FROM mes) <= 9 AND ano IN (2025, 2026)"
 verificar = "numero"
-contem_algum = ["sim", "mais"]
+contem_algum = ["sim", "mais", "aument", "cresc"]
 
 [[pergunta]]
 id = "c04"
