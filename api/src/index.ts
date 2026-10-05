@@ -42,9 +42,21 @@ const provedor: ProvedorIA = ia.reserva
     )
   : cliente(ia.modelo);
 
+// Primeira consulta ao banco: se ele estiver fora do ar, uma mensagem clara em vez do
+// stack trace do driver (o caso mais comum na máquina: Docker Desktop fechado).
+const vocabulario = await carregarVocabulario(pool).catch(async (erro: unknown) => {
+  const codigo = (erro as { code?: string }).code ?? (erro as Error).message;
+  console.error(
+    `Banco inacessível (${codigo}). Na máquina: o Docker Desktop está aberto e o container ` +
+      "honda-vendas-db rodando? Na nuvem: confira ANALISTA_DB_HOST e ANALISTA_DB_SSL.",
+  );
+  await pool.end().catch(() => {});
+  process.exit(1);
+});
+
 const app = criarApp({
   provedor,
-  contexto: { pool, vocabulario: await carregarVocabulario(pool) },
+  contexto: { pool, vocabulario },
   limitePorIp: new LimitePorIp(servidorConfig.limitePorMinuto),
   orcamento,
   modelos,
