@@ -1,0 +1,83 @@
+# Integração contínua: lint, tipos e testes (Python e API) a cada push.
+# Os testes NUNCA chamam o Groq (IA falsa): o CI não precisa da chave nem gasta cota.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      ANALISTA_DB_HOST: 127.0.0.1
+      ANALISTA_DB_PORT: "5432"
+      ANALISTA_DB_NAME: vendas_ia
+      ANALISTA_DB_NAME_TESTE: vendas_ia_teste
+      ANALISTA_DB_USER: analista_dono
+      ANALISTA_DB_PASSWORD: senha_so_do_ci
+      ANALISTA_IA_USER: analista_ia
+      ANALISTA_IA_PASSWORD: outra_senha_so_do_ci
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: requirements*.txt
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: api/package-lock.json
+
+      - name: Instalar dependências
+        run: |
+          pip install -r requirements-dev.txt
+          npm ci --prefix api
+
+      # O mesmo bootstrap.sql do ambiente local (usuários sem privilégios extras, fuso,
+      # REVOKE do PUBLIC, travas do usuário da IA), com as variáveis passadas pelo -v.
+      - name: Criar usuários e bancos
+        env:
+          PGPASSWORD: postgres
+        run: >
+          psql -X -h 127.0.0.1 -U postgres -d postgres
+          -v usuario="$ANALISTA_DB_USER" -v senha="$ANALISTA_DB_PASSWORD"
+          -v banco="$ANALISTA_DB_NAME" -v banco_teste="$ANALISTA_DB_NAME_TESTE"
+          -v ia_usuario="$ANALISTA_IA_USER" -v ia_senha="$ANALISTA_IA_PASSWORD"
+          -f db/bootstrap.sql
+
+      - name: Python - formatação e lint
+        run: |
+          ruff format --check .
+          ruff check .
+
+      - name: Python - tipos
+        run: mypy
+
+      # Também migra o banco de testes (sobe, desce e sobe), que a API usa a seguir.
+      - name: Python - testes
+        run: pytest
+
+      - name: API - lint, tipos e testes
+        working-directory: api
+        run: npm run verificar
