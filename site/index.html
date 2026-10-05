@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Business Analyst</title>
+    <meta
+      name="description"
+      content="Analista de dados com IA: o gerente pergunta em português, a IA consulta o banco só para leitura e mostra a conta. Avaliação com 36 perguntas, segurança em 4 camadas."
+    />
+    <meta property="og:title" content="AI Business Analyst · Diego Freitas Santiago" />
+    <meta
+      property="og:description"
+      content="LLM com tool calling sobre PostgreSQL só leitura: métricas oficiais, SQL travado, números conferidos e avaliação automática."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="icone.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+    />
+    <link rel="stylesheet" href="estilo.css" />
+    <script src="tema.js"></script>
+  </head>
+  <body>
+    <a class="pular" href="#conteudo" data-i18n="pular">Pular para o conteúdo</a>
+
+    <header class="topo">
+      <div class="topo-interno">
+        <a class="marca" href="#inicio">
+          <img src="icone.svg" alt="" width="28" height="28" />
+          <span>AI Business Analyst</span>
+        </a>
+        <nav class="menu" aria-label="Capítulos">
+          <a href="#problema" data-i18n="nav.problema">Problema</a>
+          <a href="#como" data-i18n="nav.como">Como funciona</a>
+          <a href="#conversas" data-i18n="nav.conversas">Conversas</a>
+          <a href="#avaliacao" data-i18n="nav.avaliacao">Avaliação</a>
+          <a href="#seguranca" data-i18n="nav.seguranca">Segurança</a>
+          <a href="#limites" data-i18n="nav.limites">Limites</a>
+        </nav>
+        <div class="controles">
+          <button type="button" id="idioma" class="botao-pilula" aria-label="Switch to English">EN</button>
+          <button type="button" id="tema" class="botao-pilula" aria-label="Alternar tema">◐</button>
+        </div>
+      </div>
+    </header>
+
+    <main id="conteudo">
+      <!-- ============================================================ HERO -->
+      <section class="hero" id="inicio">
+        <div class="largura">
+          <p class="sobretitulo" data-i18n="hero.sobre">Projeto 5 · IA aplicada a dados</p>
+          <h1 data-i18n-html="hero.titulo">O gerente pergunta em português.<br /><em>A IA consulta o banco e mostra a conta.</em></h1>
+          <p class="hero-texto" data-i18n="hero.texto">
+            Um analista de dados com IA para uma rede de concessionárias (dados 100% fictícios). A IA escolhe ferramentas,
+            consulta o PostgreSQL só para leitura e responde com números conferíveis: cada valor vem com o SQL que o
+            gerou.
+          </p>
+          <div class="kpis" id="kpis" aria-live="polite"></div>
+          <div class="hero-acoes">
+            <a class="botao-principal" href="#conversas" data-i18n="hero.ver">Ver uma conversa real</a>
+            <a class="botao-secundario" href="https://github.com/DiegoSantiago1/ai-business-analyst" data-i18n="hero.codigo"
+              >Código no GitHub</a
+            >
+          </div>
+          <p class="hero-nota" id="nota-modelo"></p>
+        </div>
+      </section>
+
+      <!-- ============================================================ PROBLEMA -->
+      <section class="capitulo" id="problema">
+        <div class="largura">
+          <p class="numero-cap">01</p>
+          <h2 data-i18n="prob.titulo">O problema</h2>
+          <p class="lead" data-i18n="prob.lead">
+            Numa concessionária, o gerente quer resposta rápida: quem está abaixo da meta, quanto o consórcio cresceu,
+            qual vendedor puxou o mês. Hoje ele depende de alguém que saiba SQL ou de um painel que só responde ao que foi
+            previsto.
+          </p>
+          <div class="grade-3">
+            <article class="cartao">
+              <h3 data-i18n="prob.c1t">Pergunta nova = fila</h3>
+              <p data-i18n="prob.c1">Cada pergunta fora do painel vira um pedido para quem sabe SQL.</p>
+            </article>
+            <article class="cartao">
+              <h3 data-i18n="prob.c2t">IA que inventa é pior</h3>
+              <p data-i18n="prob.c2">
+                Um chatbot que "chuta" um número com confiança é mais perigoso que nenhuma resposta.
+              </p>
+            </article>
+            <article class="cartao">
+              <h3 data-i18n="prob.c3t">O banco não pode correr risco</h3>
+              <p data-i18n="prob.c3">
+                Dar acesso ao banco para um modelo de linguagem exige garantir que ele nunca altere nada.
+              </p>
+            </article>
+          </div>
+          <p class="origem" data-i18n="prob.origem">
+            O problema é real: é o trabalho do autor numa concessionária Honda em Recife, onde ele montou o painel de
+            vendas do Projeto 1. Este projeto amplia aquele modelo de dados para 24 meses fictícios.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============================================================ COMO FUNCIONA -->
+      <section class="capitulo alt" id="como">
+        <div class="largura">
+          <p class="numero-cap">02</p>
+          <h2 data-i18n="como.titulo">Como funciona</h2>
+          <p class="lead" data-i18n="como.lead">
+            A IA não escreve SQL livremente por padrão: ela escolhe entre métricas oficiais, e a API monta o SQL com
+            parâmetros. O SQL livre existe como reserva, atrás de travas.
+          </p>
+          <div class="fluxo" aria-label="Fluxo de uma pergunta">
+            <div class="no n1">
+              <span class="no-rotulo" data-i18n="como.n1r">Interface</span>
+              <strong>React + TypeScript</strong>
+              <span data-i18n="como.n1">pergunta em português</span>
+            </div>
+            <div class="seta s1" aria-hidden="true">→</div>
+            <div class="no destaque n2">
+              <span class="no-rotulo" data-i18n="como.n2r">API Node 24 + TS</span>
+              <strong data-i18n="como.n2t">Loop de ferramentas</strong>
+              <span data-i18n="como.n2">até 6 voltas · orçamento de tokens · resposta validada (zod)</span>
+            </div>
+            <div class="seta s2" aria-hidden="true">⇄</div>
+            <div class="no n3">
+              <span class="no-rotulo">Groq</span>
+              <strong>gpt-oss-120b</strong>
+              <span data-i18n="como.n3">tool calling, plano gratuito</span>
+            </div>
+            <div class="seta s3" aria-hidden="true">↓</div>
+            <div class="no banco n4">
+              <span class="no-rotulo">PostgreSQL 16</span>
+              <strong data-i18n="como.n4t">Usuário analista_ia: só SELECT em 7 views</strong>
+              <span data-i18n="como.n4">transação somente leitura · 3 s por consulta · máx. 200 linhas</span>
+            </div>
+          </div>
+          <h3 class="subtitulo" data-i18n="como.ferr">As 4 ferramentas da IA</h3>
+          <div class="grade-4">
+            <article class="cartao ferramenta">
+              <code>consultar_metrica</code>
+              <p data-i18n="como.f1">
+                Caminho principal. 9 métricas oficiais (faturamento, ticket médio, % da meta…) com SQL parametrizado: o
+                número certo por construção.
+              </p>
+            </article>
+            <article class="cartao ferramenta">
+              <code>executar_sql</code>
+              <p data-i18n="como.f2">Reserva para o que o catálogo não cobre. Um SELECT só, atrás de 4 camadas de defesa.</p>
+            </article>
+            <article class="cartao ferramenta">
+              <code>descrever_tabelas</code>
+              <p data-i18n="como.f3">Colunas e descrições das views, lidas dos comentários do próprio banco.</p>
+            </article>
+            <article class="cartao ferramenta">
+              <code>responder</code>
+              <p data-i18n="como.f4">
+                Resposta final estruturada. Cada número citado é procurado nos resultados do banco: achou = "conferido".
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ CONVERSAS -->
+      <section class="capitulo" id="conversas">
+        <div class="largura">
+          <p class="numero-cap">03</p>
+          <h2 data-i18n="conv.titulo">Conversas reais, passo a passo</h2>
+          <p class="lead" data-i18n="conv.lead">
+            Gravadas da avaliação oficial (sem edição). Escolha uma pergunta e avance pelos passos: a ferramenta que a IA
+            chamou, o SQL que rodou, o que o banco devolveu e a resposta.
+          </p>
+          <div class="conversas">
+            <div class="lista-conversas" role="tablist" aria-label="Conversas" id="lista-conversas"></div>
+            <div class="player" id="player" tabindex="0" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ AVALIAÇÃO -->
+      <section class="capitulo alt" id="avaliacao">
+        <div class="largura">
+          <p class="numero-cap">04</p>
+          <h2 data-i18n="aval.titulo">Avaliação: 36 perguntas com resposta certa conhecida</h2>
+          <p class="lead" data-i18n="aval.lead">
+            "A IA responde bem" só vale com número medido. Cada pergunta tem um SQL de referência que gera a resposta
+            certa; o avaliador (Python) faz a pergunta pela API e confere. Os padrões foram plantados nos dados fictícios de
+            propósito: se a IA não os encontra, ela errou.
+          </p>
+          <div class="tiles" id="tiles"></div>
+          <div class="duas-colunas">
+            <figure class="figura">
+              <figcaption data-i18n="aval.grafico">Acertos por tipo de pergunta</figcaption>
+              <div id="grafico-tipos"></div>
+            </figure>
+            <div class="cartao legenda-tipos" id="legenda-tipos"></div>
+          </div>
+          <div id="comparacao"></div>
+          <h3 class="subtitulo" data-i18n="aval.aprendeu">O que a avaliação pegou — e o que mudou</h3>
+          <p class="lead" data-i18n="aval.aprendeuLead">
+            O valor de uma avaliação é achar erro. Cada falha virou uma correção no código ou no prompt, e foi medida de
+            novo.
+          </p>
+          <ol class="aprendizados" id="aprendizados"></ol>
+          <details class="todas">
+            <summary data-i18n="aval.todas">Ver as 36 perguntas e o veredito de cada uma</summary>
+            <div class="tabela-rolagem"><table id="tabela-perguntas"></table></div>
+          </details>
+        </div>
+      </section>
+
+      <!-- ============================================================ SEGURANÇA -->
+      <section class="capitulo" id="seguranca">
+        <div class="largura">
+          <p class="numero-cap">05</p>
+          <h2 data-i18n="seg.titulo">Segurança: defesa em 4 camadas</h2>
+          <p class="lead" data-i18n="seg.lead">
+            Uma checagem de texto na aplicação pode ser enganada por um SQL criativo; uma permissão do banco, não. Por isso
+            cada camada tem teste hostil próprio, e a garantia final é o PostgreSQL.
+          </p>
+          <ol class="camadas">
+            <li>
+              <span class="camada-n">1</span>
+              <div>
+                <strong data-i18n="seg.c1t">Aplicação</strong>
+                <p data-i18n="seg.c1">
+                  Um comando só, começando com SELECT ou WITH, sem funções de sistema (pg_sleep, set_config, leitura de
+                  arquivo, catálogo), máx. 4.000 caracteres, embrulhado num LIMIT.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span class="camada-n">2</span>
+              <div>
+                <strong data-i18n="seg.c2t">Driver</strong>
+                <p data-i18n="seg.c2">Protocolo estendido do PostgreSQL: aceita um comando só, mesmo com "; DROP …" no texto.</p>
+              </div>
+            </li>
+            <li>
+              <span class="camada-n">3</span>
+              <div>
+                <strong data-i18n="seg.c3t">Transação</strong>
+                <p data-i18n="seg.c3">BEGIN READ ONLY e tempo máximo de 3 s por consulta.</p>
+              </div>
+            </li>
+            <li class="garantia">
+              <span class="camada-n">4</span>
+              <div>
+                <strong data-i18n="seg.c4t">Banco (a garantia)</strong>
+                <p data-i18n="seg.c4">
+                  O usuário da IA só tem SELECT em 7 views, nenhum acesso às tabelas de origem, sem CREATE nem TEMP, máx. 5
+                  conexões. A API nem conhece a senha do dono do banco.
+                </p>
+              </div>
+            </li>
+          </ol>
+          <h3 class="subtitulo" data-i18n="seg.ataques">Ataques testados e onde cada um parou</h3>
+          <div class="tabela-rolagem">
+            <table class="tabela" id="tabela-ataques"></table>
+          </div>
+          <p class="nota" id="nota-intacto"></p>
+        </div>
+      </section>
+
+      <!-- ============================================================ LIMITES -->
+      <section class="capitulo alt" id="limites">
+        <div class="largura">
+          <p class="numero-cap">06</p>
+          <h2 data-i18n="lim.titulo">Custos, limites e o que ainda não é bom</h2>
+          <div class="duas-colunas">
+            <div>
+              <h3 class="subtitulo" data-i18n="lim.custo">Custo</h3>
+              <div id="custos"></div>
+            </div>
+            <div>
+              <h3 class="subtitulo" data-i18n="lim.limitacoes">Limitações (medidas, não escondidas)</h3>
+              <ul class="lista-limites" id="lista-limites"></ul>
+            </div>
+          </div>
+          <h3 class="subtitulo" data-i18n="lim.stack">Stack</h3>
+          <ul class="chips" id="stack"></ul>
+        </div>
+      </section>
+    </main>
+
+    <footer class="rodape">
+      <div class="largura rodape-interno">
+        <p>
+          <strong>Diego Freitas Santiago</strong> · <span data-i18n="rod.papel">Dados · Backend · IA aplicada</span> ·
+          Recife
+        </p>
+        <p>
+          <a href="https://diegosantiago1.github.io/Portifolio/" data-i18n="rod.portfolio">Portfólio</a> ·
+          <a href="https://github.com/DiegoSantiago1/ai-business-analyst">GitHub</a> ·
+          <a href="https://www.linkedin.com/in/diego-freitas-santiago">LinkedIn</a>
+        </p>
+        <p class="nota" data-i18n="rod.dados">
+          Dados 100% fictícios, gerados em Python com semente fixa. Nenhum dado real de concessionária é usado.
+        </p>
+      </div>
+    </footer>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
