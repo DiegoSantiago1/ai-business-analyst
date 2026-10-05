@@ -41,3 +41,16 @@ export async function perguntarApi(
   }
   return corpo as Resultado;
 }
+
+export interface Saude {
+  banco: string;
+  modelo: string;
+  perguntasRestantes: number;
+}
+
+/** Estado da API. Na hospedagem gratuita, a 1ª chamada pode levar ~1 min (servidor dormindo). */
+export async function saudeApi(sinal?: AbortSignal): Promise<Saude> {
+  const resposta = await fetch("/api/saude", sinal ? { signal: sinal } : {});
+  if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
+  return (await resposta.json()) as Saude;
+}

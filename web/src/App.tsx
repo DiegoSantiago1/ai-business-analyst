@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { FalhaApi, perguntarApi, type Troca } from "./api.ts";
+import { FalhaApi, perguntarApi, type Saude, saudeApi, type Troca } from "./api.ts";
 import { Resposta } from "./componentes/Resposta.tsx";
 import type { ErroApi, Resultado } from "./tipos.ts";
 
@@ -38,10 +38,31 @@ export function App() {
   const [tema, setTema] = useState<Tema>(temaAtual);
   const fim = useRef<HTMLDivElement>(null);
   const proximoId = useRef(1);
+  const [saude, setSaude] = useState<Saude | null>(null);
+  const [acordando, setAcordando] = useState(false);
+
+  // Estado da demonstração: perguntas restantes hoje e, se a 1ª resposta demora, o aviso
+  // de que o servidor gratuito está acordando (pode levar ~1 min).
+  useEffect(() => {
+    const controle = new AbortController();
+    const lento = setTimeout(() => setAcordando(true), 2_500);
+    saudeApi(controle.signal)
+      .then(setSaude)
+      .catch(() => {})
+      .finally(() => {
+        clearTimeout(lento);
+        setAcordando(false);
+      });
+    return () => {
+      clearTimeout(lento);
+      controle.abort();
+    };
+  }, []);
 
   // Rola até a última mensagem sempre que a conversa muda (as dependências são o gatilho).
   // biome-ignore lint/correctness/useExhaustiveDependencies: itens e carregando disparam a rolagem
   useEffect(() => {
+    if (itens.length === 0) return; // sem conversa, a página fica no topo
     fim.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [itens, carregando]);
 
@@ -69,6 +90,9 @@ export function App() {
     try {
       const resultado = await perguntarApi(limpa, historico);
       setItens((atual) => atual.map((i) => (i.id === id ? { ...i, resultado } : i)));
+      saudeApi()
+        .then(setSaude)
+        .catch(() => {});
     } catch (e) {
       const erro: ErroApi =
         e instanceof FalhaApi
@@ -95,15 +119,24 @@ export function App() {
             </p>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={trocarTema}
-          className="shrink-0 rounded-full border border-linha px-3 py-1.5 text-sm whitespace-nowrap text-tinta-2 hover:bg-superficie"
-          aria-label={tema === "dark" ? "Usar tema claro" : "Usar tema escuro"}
-        >
-          {tema === "dark" ? "☀ Claro" : "☾ Escuro"}
-        </button>
+        <div className="flex shrink-0 items-center gap-2">
+          <a
+            href={PAGINA_RESULTADOS}
+            className="hidden rounded-full px-3 py-1.5 text-sm text-tinta-2 hover:bg-superficie sm:inline"
+          >
+            Conversas gravadas ↗
+          </a>
+          <button
+            type="button"
+            onClick={trocarTema}
+            className="shrink-0 rounded-full border border-linha px-3 py-1.5 text-sm whitespace-nowrap text-tinta-2 hover:bg-superficie"
+            aria-label={tema === "dark" ? "Usar tema claro" : "Usar tema escuro"}
+          >
+            {tema === "dark" ? "☀ Claro" : "☾ Escuro"}
+          </button>
+        </div>
       </header>
+      <AvisoDemo saude={saude} acordando={acordando} />
 
       <main className="flex-1 space-y-6 pb-6">
         {itens.length === 0 && <BoasVindas aoEscolher={enviar} />}
@@ -159,6 +192,33 @@ export function App() {
         </p>
       </form>
     </div>
+  );
+}
+
+function AvisoDemo({ saude, acordando }: { saude: Saude | null; acordando: boolean }) {
+  if (acordando) {
+    return (
+      <p
+        className="m-0 mb-2 rounded-xl border border-linha bg-superficie px-3 py-2 text-sm text-tinta-2"
+        role="status"
+      >
+        <span className="pulso">Acordando o servidor…</span> a hospedagem gratuita dorme quando
+        ninguém usa; a primeira resposta pode levar até 1 minuto.
+      </p>
+    );
+  }
+  if (!saude) return null;
+  return (
+    <p className="m-0 mb-2 rounded-xl border border-linha bg-superficie px-3 py-2 text-sm text-tinta-2">
+      Demonstração ao vivo no plano gratuito do provedor de IA: cerca de{" "}
+      <strong className="text-tinta">{saude.perguntasRestantes}</strong>{" "}
+      {saude.perguntasRestantes === 1 ? "pergunta restante" : "perguntas restantes"} hoje, ~1 por
+      minuto. Se acabar,{" "}
+      <a href={PAGINA_RESULTADOS} className="text-acento hover:underline">
+        veja as conversas gravadas
+      </a>
+      .
+    </p>
   );
 }
 
