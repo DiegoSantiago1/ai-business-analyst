@@ -20,3 +20,6 @@ dist/
 .vscode/
 
 .DS_Store
+
+# Registro de perguntas da API (tokens, latência), gerado em execução
+api/registros/
