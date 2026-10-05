@@ -7,6 +7,7 @@ import {
   lerDuracao,
   lerEspera,
   recuperarChamada,
+  textoGerado,
 } from "../src/ia/groq.ts";
 import {
   ErroCotaEsgotada,
@@ -60,7 +61,7 @@ describe("ClienteGroq", () => {
   test("monta o pedido no formato da OpenAI com as opções de economia", async () => {
     const { cliente, chamadas } = clienteCom([resposta(200, OK)]);
     const r = await cliente.completar(PEDIDO);
-    assert.deepEqual(r.uso, { entrada: 100, saida: 20, total: 120 });
+    assert.deepEqual(r.uso, { entrada: 100, saida: 20, total: 120, esperaMs: 0 });
     const [chamada] = chamadas;
     assert.ok(chamada);
     assert.equal(chamada.url, "https://api.groq.com/openai/v1/chat/completions");
@@ -294,4 +295,31 @@ test("nome 'json' (gpt-oss-120b): a ferramenta é deduzida pelos campos", () => 
   assert.equal(recuperarChamada(gerado({ outra: 1 }), nomes), undefined);
   // Deduzida, mas fora do pedido: não recupera.
   assert.equal(recuperarChamada(gerado({ sql: "x" }), ["responder"]), undefined);
+});
+
+describe("geração malformada que não dá para recuperar (120b: 'response' com texto)", () => {
+  const gerado =
+    '{"name": "response", "arguments": A forma com maior desconto é **À vista**, 4,99 %.}';
+
+  test("textoGerado tira o envelope", () => {
+    assert.equal(textoGerado(gerado), "A forma com maior desconto é **À vista**, 4,99 %.");
+    assert.equal(textoGerado("só texto"), "só texto");
+  });
+
+  test("vira resposta de texto, sem repetir o pedido", async () => {
+    const { cliente, chamadas } = clienteCom([
+      resposta(400, {
+        error: { code: "tool_use_failed", message: "Failed to parse", failed_generation: gerado },
+      }),
+    ]);
+    const r = await cliente.completar({
+      ...PEDIDO,
+      ferramentas: [
+        { type: "function", function: { name: "responder", description: "", parameters: {} } },
+      ],
+    });
+    assert.equal(chamadas.length, 1);
+    assert.match(r.mensagem.content ?? "", /À vista/);
+    assert.equal(r.mensagem.tool_calls, undefined);
+  });
 });

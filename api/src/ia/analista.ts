@@ -53,6 +53,8 @@ export interface ResultadoPergunta {
     tokensSaida: number;
     tokensTotal: number;
     latenciaMs: number;
+    /** Parte da latência gasta esperando a cota do minuto do provedor. */
+    esperaCotaMs: number;
   };
 }
 
@@ -77,12 +79,16 @@ export async function perguntar(
   mensagens.push({ role: "user", content: pergunta });
 
   const passos: Passo[] = [];
-  const uso = { entrada: 0, saida: 0, total: 0 };
+  const uso = { entrada: 0, saida: 0, total: 0, espera: 0 };
   let modelo = provedor.modelo;
   let correcoes = 0;
+  // Depois de uma resposta em texto livre, a volta seguinte OBRIGA a ferramenta responder.
+  let forcarResposta = false;
 
   for (let volta = 1; volta <= MAX_VOLTAS; volta++) {
-    const ultimaChance = volta === MAX_VOLTAS || uso.total >= ORCAMENTO_TOKENS_POR_PERGUNTA;
+    const ultimaChance =
+      forcarResposta || volta === MAX_VOLTAS || uso.total >= ORCAMENTO_TOKENS_POR_PERGUNTA;
+    forcarResposta = false;
     const r = await provedor.completar({
       mensagens,
       ferramentas: FERRAMENTAS,
@@ -91,6 +97,7 @@ export async function perguntar(
     uso.entrada += r.uso.entrada;
     uso.saida += r.uso.saida;
     uso.total += r.uso.total;
+    uso.espera += r.uso.esperaMs ?? 0;
     modelo = r.modelo;
 
     // Os gpt-oss chamam uma ferramenta por volta; se vierem várias, todas são atendidas.
@@ -101,6 +108,7 @@ export async function perguntar(
         { role: "assistant", content: r.mensagem.content ?? "" },
         { role: "user", content: "Use a ferramenta responder para dar a resposta final." },
       );
+      forcarResposta = true;
       continue;
     }
     mensagens.push({
@@ -126,6 +134,7 @@ export async function perguntar(
               tokensSaida: uso.saida,
               tokensTotal: uso.total,
               latenciaMs: Math.round(performance.now() - inicio),
+              esperaCotaMs: uso.espera,
             },
           };
         }
@@ -149,7 +158,13 @@ export async function perguntar(
       });
     }
   }
-  throw new ErroRespostaInvalida(`A IA não respondeu em ${MAX_VOLTAS} voltas.`);
+  // Sem resposta: o erro conta o que aconteceu (fica no registro, para diagnosticar).
+  const usadas =
+    passos.map((p) => `${p.ferramenta}${p.erro ? "(erro)" : ""}`).join(", ") || "nenhuma";
+  const ultimaFalha = passos.findLast((p) => p.erro)?.erro ?? "";
+  throw new ErroRespostaInvalida(
+    `A IA não respondeu em ${MAX_VOLTAS} voltas. Ferramentas: ${usadas}.${ultimaFalha ? ` Última falha: ${ultimaFalha}` : ""}`,
+  );
 }
 
 type Validacao =

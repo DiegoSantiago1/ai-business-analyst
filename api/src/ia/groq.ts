@@ -78,6 +78,14 @@ export function ehLimiteDiario(mensagem: string | undefined): boolean {
 
 let recuperadas = 0;
 
+/** O texto de uma geração malformada, sem o envelope {"name": ..., "arguments": ...}. */
+export function textoGerado(gerado: string): string {
+  const m = gerado.match(
+    /^\s*\{\s*"name"\s*:\s*"[^"]*"\s*,\s*"arguments"\s*:\s*([\s\S]*?)\s*\}?\s*$/,
+  );
+  return (m?.[1] ?? gerado).replace(/^"|"$/g, "").trim();
+}
+
 /** Ferramenta pelo campo que só ela tem. */
 function deduzirFerramenta(args: unknown): string | undefined {
   if (!args || typeof args !== "object") return undefined;
@@ -223,21 +231,35 @@ export class ClienteGroq implements ProvedorIA {
         return {
           mensagem: { content: texto },
           modelo: this.modelo,
-          uso: { entrada, saida, total: entrada + saida },
+          uso: { entrada, saida, total: entrada + saida, esperaMs: Math.round(esperado * 1000) },
         };
       }
       if (resposta.status === 400 && dados.error?.code === "tool_use_failed") {
+        const gerado = dados.error.failed_generation ?? "";
         const nomes = pedido.ferramentas.map((f) => f.function.name);
-        const recuperada = recuperarChamada(dados.error.failed_generation, nomes);
+        const recuperada = recuperarChamada(gerado, nomes);
+        // Sem "usage" na resposta de erro: os tokens são estimados.
+        const saida = estimarTokens(gerado);
+        const entrada = estimarTokens(corpo);
+        const uso = {
+          entrada,
+          saida,
+          total: entrada + saida,
+          esperaMs: Math.round(esperado * 1000),
+        };
         if (recuperada) {
-          // Sem "usage" na resposta de erro: os tokens são estimados.
-          const saida = estimarTokens(dados.error.failed_generation ?? "");
-          const entrada = estimarTokens(corpo);
           return {
             mensagem: { content: null, tool_calls: [recuperada] },
             modelo: this.modelo,
-            uso: { entrada, saida, total: entrada + saida },
+            uso,
           };
+        }
+        if (gerado) {
+          // Não deu para recuperar a chamada (medido no 120b: ferramenta "response" com a
+          // resposta em texto corrido no lugar do JSON). Repetir o mesmo pedido dá o mesmo
+          // erro; vira resposta de texto, e o loop obriga a ferramenta responder na volta
+          // seguinte.
+          return { mensagem: { content: textoGerado(gerado) }, modelo: this.modelo, uso };
         }
         erros++;
         ultimoErro = "tool_use_failed: o modelo gerou uma chamada de ferramenta inválida";
@@ -262,6 +284,7 @@ export class ClienteGroq implements ProvedorIA {
           entrada: dados.usage?.prompt_tokens ?? 0,
           saida: dados.usage?.completion_tokens ?? 0,
           total: dados.usage?.total_tokens ?? 0,
+          esperaMs: Math.round(esperado * 1000),
         },
       };
     }

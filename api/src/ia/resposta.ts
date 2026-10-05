@@ -9,20 +9,47 @@
 import { z } from "zod";
 import type { Passo } from "./ferramentas.ts";
 
+/** "1.234,5" / "1234.5" / "72,1%" -> número; outra coisa -> undefined. */
+export function numeroDeTexto(texto: string): number | undefined {
+  const limpo = texto.replace(/[R$%\s]/g, "");
+  if (!/^-?[\d.,]+$/.test(limpo)) return undefined;
+  const ptBR = /,\d{1,2}$/.test(limpo) || /^\d{1,3}(\.\d{3})+$/.test(limpo);
+  const n = Number(ptBR ? limpo.replace(/\./g, "").replace(",", ".") : limpo.replace(/,/g, ""));
+  return Number.isFinite(n) ? n : undefined;
+}
+
+function normalizarNumeros(valor: unknown): unknown {
+  if (!Array.isArray(valor)) return valor;
+  return valor.flatMap((item) => {
+    if (!item || typeof item !== "object") return [item];
+    const v = (item as { valor?: unknown }).valor;
+    if (typeof v !== "string") return [item];
+    const n = numeroDeTexto(v);
+    return n === undefined ? [] : [{ ...item, valor: n }];
+  });
+}
+
 export const esquemaResposta = z
   .object({
     resposta: z.string().trim().min(1).max(2_000),
+    // O modelo às vezes manda o valor como texto ("72,1") ou põe uma data em numeros
+    // (medido no 20b, 05/10/2026). Texto numérico vira número; o que não é número sai do
+    // cartão (a resposta em texto continua citando). Sem isso, uma volta de correção.
     numeros: z
-      .array(
+      .preprocess(
+        normalizarNumeros,
         z
-          .object({
-            rotulo: z.string().trim().min(1).max(120),
-            valor: z.number().finite(),
-            unidade: z.enum(["R$", "unidades", "vendas", "%", "outro"]),
-          })
-          .strict(),
+          .array(
+            z
+              .object({
+                rotulo: z.string().trim().min(1).max(120),
+                valor: z.number().finite(),
+                unidade: z.enum(["R$", "unidades", "vendas", "%", "outro"]),
+              })
+              .strict(),
+          )
+          .max(60),
       )
-      .max(60)
       // Cabem 12 cartões na tela; o resto continua na tabela (que vem do banco).
       .transform((numeros) => numeros.slice(0, 12))
       // Resposta sem número nenhum (ex.: "quem foi o último cliente?") é válida.

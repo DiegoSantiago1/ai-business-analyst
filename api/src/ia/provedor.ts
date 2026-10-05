@@ -35,6 +35,8 @@ export interface Uso {
   entrada: number;
   saida: number;
   total: number;
+  /** Tempo esperando a cota do minuto do provedor (não é tempo de processamento). */
+  esperaMs?: number;
 }
 
 export interface RespostaIA {

@@ -139,6 +139,7 @@ export interface Passo {
   totalLinhas?: number;
   truncado?: boolean;
   erro?: string;
+  aviso?: string;
   duracaoMs: number;
 }
 
@@ -229,9 +230,9 @@ export async function executarFerramenta(
     argumentos = lerArgumentos(textoArgumentos);
     const args = argumentos as Record<string, unknown>;
     if (nome === "consultar_metrica") {
-      const { sql, parametros } = montarConsulta(args, contexto.vocabulario.valores);
+      const { sql, parametros, aviso } = montarConsulta(args, contexto.vocabulario.valores);
       const r = await consultarSomenteLeitura(contexto.pool, sql, parametros);
-      return comoPasso(nome, argumentos, sql, parametros, r);
+      return { ...comoPasso(nome, argumentos, sql, parametros, r), ...(aviso ? { aviso } : {}) };
     }
     if (nome === "executar_sql") {
       const sql = prepararSqlLivre(args.sql);
@@ -266,5 +267,6 @@ export function resultadoParaModelo(passo: Passo): string {
       ? { aviso: `mostrando ${LINHAS_PARA_O_MODELO} de ${total}` }
       : {}),
     ...(passo.truncado ? { aviso_corte: `resultado cortado em ${MAX_LINHAS} linhas` } : {}),
+    ...(passo.aviso ? { atencao: passo.aviso } : {}),
   });
 }

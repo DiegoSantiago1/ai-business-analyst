@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { conferir, esquemaResposta, inferirGrafico, validarGrafico } from "../src/ia/resposta.ts";
+import {
+  conferir,
+  esquemaResposta,
+  inferirGrafico,
+  numeroDeTexto,
+  validarGrafico,
+} from "../src/ia/resposta.ts";
 
 const BASE = { resposta: "ok", numeros: [] };
 
@@ -118,4 +124,31 @@ test("inferirGrafico: só nos casos óbvios", () => {
   assert.equal(inferirGrafico(duasDimensoes), undefined);
   assert.equal(inferirGrafico(tabela(["unidades"], [{ unidades: 1 }])), undefined);
   assert.equal(inferirGrafico(undefined), undefined);
+});
+
+test("numeros: texto numérico vira número; data e texto saem do cartão", () => {
+  const r = esquemaResposta.parse({
+    resposta: "ok",
+    numeros: [
+      { rotulo: "a", valor: "72,1", unidade: "%" },
+      { rotulo: "b", valor: "1.234", unidade: "unidades" },
+      { rotulo: "c", valor: "2026-03-31", unidade: "outro" },
+      { rotulo: "d", valor: "Carlos Lima", unidade: "outro" },
+      { rotulo: "e", valor: 5, unidade: "vendas" },
+    ],
+  });
+  assert.deepEqual(
+    r.numeros.map((n) => [n.rotulo, n.valor]),
+    [
+      ["a", 72.1],
+      ["b", 1234],
+      ["e", 5],
+    ],
+  );
+});
+
+test("numeroDeTexto", () => {
+  assert.equal(numeroDeTexto("R$ 1.234,56"), 1234.56);
+  assert.equal(numeroDeTexto("7.5"), 7.5);
+  assert.equal(numeroDeTexto("31/03/2026"), undefined);
 });

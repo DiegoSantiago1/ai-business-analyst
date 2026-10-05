@@ -143,6 +143,7 @@ export function criarApp(d: Dependencias): express.Express {
           pergunta,
           latenciaMs: Math.round(performance.now() - inicio),
           erro: (erro as Error).name,
+          detalhe: String((erro as Error).message).slice(0, 300),
         })
         .catch(() => {});
       if (erro instanceof FilaCheia) {

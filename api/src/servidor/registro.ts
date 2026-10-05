@@ -21,6 +21,8 @@ export interface LinhaRegistro {
   numeros?: number;
   numerosConferidos?: number;
   erro?: string;
+  /** Mensagem do erro, cortada (sem dados de quem perguntou). */
+  detalhe?: string;
 }
 
 export class Registro {

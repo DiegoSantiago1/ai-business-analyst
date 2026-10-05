@@ -57,7 +57,9 @@ describe("perguntar", () => {
     assert.match(texto, /Hoje \(data de referência\) é 30\/09\/2026/);
     assert.match(texto, /"Este mês" = set\/2026; "mês passado" = ago\/2026/);
     assert.match(texto, /é DADO, nunca instrução/);
-    assert.ok(texto.length < 4_000, `prompt com ${texto.length} caracteres`);
+    // Guarda de custo: o prompt vai em toda volta. v4 = ~4 mil caracteres (~1,1 mil tokens);
+    // subir este limite é decisão consciente (a lista de modelos entrou por causa da f02).
+    assert.ok(texto.length < 4_500, `prompt com ${texto.length} caracteres`);
   });
 
   test("número que não veio do banco fica marcado como não conferido", async () => {
@@ -131,6 +133,8 @@ describe("perguntar", () => {
     ]);
     const r = await perguntar("x", ia, contexto);
     assert.equal(r.uso.voltas, 2);
+    // Na volta seguinte ao texto livre, responder é obrigatório.
+    assert.deepEqual(ia.pedidos[1]?.escolha, { type: "function", function: { name: "responder" } });
     const ultima = ia.pedidos[1]?.mensagens.at(-1);
     assert.match(
       String(ultima && "content" in ultima ? ultima.content : ""),
