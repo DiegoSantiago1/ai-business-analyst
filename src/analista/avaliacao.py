@@ -259,10 +259,10 @@ class CotaEsgotada(RuntimeError):
 
 
 def perguntar_api(
-    pergunta: str, url: str = URL_API, tentativas: int = 8
+    pergunta: str, url: str = URL_API, tentativas: int = 8, detalhada: bool = False
 ) -> tuple[int, dict[str, Any]]:
     """POST /api/perguntar. Espera e repete em limite_por_ip e ocupado; para na cota."""
-    corpo = json.dumps({"pergunta": pergunta}).encode()
+    corpo = json.dumps({"pergunta": pergunta, "detalhada": detalhada}).encode()
     for _ in range(tentativas):
         pedido = urllib.request.Request(  # noqa: S310 (URL local fixa)
             f"{url}/api/perguntar", data=corpo, headers={"Content-Type": "application/json"}
@@ -381,6 +381,9 @@ def main(argumentos: list[str] | None = None) -> int:
         "--reavaliar", type=Path, help="só reconfere as respostas gravadas (sem chamar a API)"
     )
     parser.add_argument("--url", default=URL_API)
+    parser.add_argument(
+        "--detalhada", action="store_true", help="resposta elaborada (prompt v5 detalhado)"
+    )
     args = parser.parse_args(argumentos)
 
     perguntas = carregar_perguntas()
@@ -413,7 +416,7 @@ def main(argumentos: list[str] | None = None) -> int:
         for p in perguntas:
             esperado = referencia(con, p.sql)
             try:
-                status, resposta = perguntar_api(p.pergunta, args.url)
+                status, resposta = perguntar_api(p.pergunta, args.url, detalhada=args.detalhada)
             except CotaEsgotada as erro:
                 print(f"PAROU: {erro} Retome com --continuar {arquivo}")
                 parou = True

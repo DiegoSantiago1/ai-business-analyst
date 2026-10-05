@@ -1,0 +1,735 @@
+{
+ "modelo": "openai/gpt-oss-20b",
+ "inicio": "2026-10-05T11:21:52.720481+00:00",
+ "itens": [
+  {
+   "id": "n03",
+   "tipo": "numero",
+   "pergunta": "Qual o ticket médio da Loja Norte em agosto de 2026?",
+   "esperado": [
+    [
+     "154229.26"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Qual o ticket médio da Loja Norte em agosto de 2026?",
+    "resposta": "**Ticket médio da Loja Norte em agosto de 2026: R$ 154.229,26**",
+    "numeros": [
+     {
+      "rotulo": "ticket_medio",
+      "valor": 154229.26,
+      "unidade": "R$",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "loja",
+      "ticket_medio"
+     ],
+     "linhas": [
+      {
+       "loja": "Loja Norte",
+       "ticket_medio": 154229.26
+      }
+     ],
+     "sql": "SELECT loja, round(sum(valor_total) / nullif(sum(quantidade), 0), 2) AS ticket_medio\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date AND loja = ANY($3::text[])\nGROUP BY loja\nORDER BY ticket_medio ASC NULLS LAST, loja\nLIMIT $4",
+     "truncado": false
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [
+        "loja"
+       ],
+       "ate": "2026-08-31",
+       "de": "2026-08-01",
+       "filtros": {
+        "loja": [
+         "Loja Norte"
+        ]
+       },
+       "metricas": [
+        "ticket_medio"
+       ],
+       "ordem": "asc",
+       "ordenar_por": "ticket_medio"
+      },
+      "sql": "SELECT loja, round(sum(valor_total) / nullif(sum(quantidade), 0), 2) AS ticket_medio\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date AND loja = ANY($3::text[])\nGROUP BY loja\nORDER BY ticket_medio ASC NULLS LAST, loja\nLIMIT $4",
+      "parametros": [
+       "2026-08-01",
+       "2026-08-31",
+       [
+        "Loja Norte"
+       ],
+       50
+      ],
+      "colunas": [
+       "loja",
+       "ticket_medio"
+      ],
+      "linhas": [
+       {
+        "loja": "Loja Norte",
+        "ticket_medio": 154229.26
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 17
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-20b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 2,
+     "tokensEntrada": 4547,
+     "tokensSaida": 177,
+     "tokensTotal": 4724,
+     "latenciaMs": 3528,
+     "esperaCotaMs": 2370
+    }
+   }
+  },
+  {
+   "id": "n05",
+   "tipo": "numero",
+   "pergunta": "Qual o desconto médio, em %, nas vendas à vista em 2026?",
+   "esperado": [
+    [
+     "5.00"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Qual o desconto médio, em %, nas vendas à vista em 2026?",
+    "resposta": "**O desconto médio nas vendas à vista em 2026 foi de 5 %.**\n- Esse valor corresponde ao cálculo do desconto médio sobre o preço de tabela para todas as vendas à vista no ano.\n- Não há variação mensal disponível nesta consulta.\nSugestão: comparar o desconto médio por loja em 2026.",
+    "numeros": [
+     {
+      "rotulo": "desconto_medio_pct",
+      "valor": 5,
+      "unidade": "%",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "desconto_medio_pct"
+     ],
+     "linhas": [
+      {
+       "desconto_medio_pct": 5
+      }
+     ],
+     "sql": "SELECT round(100 * sum(desconto_total) / nullif(sum(quantidade * preco_tabela), 0), 2) AS desconto_medio_pct\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date AND forma_pagamento = ANY($3::text[])\nLIMIT $4",
+     "truncado": false
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [],
+       "ate": "2026-12-31",
+       "de": "2026-01-01",
+       "filtros": {
+        "forma_pagamento": [
+         "A vista"
+        ]
+       },
+       "metricas": [
+        "desconto_medio_pct"
+       ]
+      },
+      "sql": "SELECT round(100 * sum(desconto_total) / nullif(sum(quantidade * preco_tabela), 0), 2) AS desconto_medio_pct\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date AND forma_pagamento = ANY($3::text[])\nLIMIT $4",
+      "parametros": [
+       "2026-01-01",
+       "2026-12-31",
+       [
+        "A vista"
+       ],
+       50
+      ],
+      "colunas": [
+       "desconto_medio_pct"
+      ],
+      "linhas": [
+       {
+        "desconto_medio_pct": 5
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 30
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-20b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 2,
+     "tokensEntrada": 4750,
+     "tokensSaida": 220,
+     "tokensTotal": 4970,
+     "latenciaMs": 35777,
+     "esperaCotaMs": 34487
+    }
+   }
+  },
+  {
+   "id": "r03",
+   "tipo": "ranking",
+   "pergunta": "Qual vendedor vendeu mais unidades na Loja Norte em setembro de 2026?",
+   "esperado": [
+    [
+     "Rafael Moura"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Qual vendedor vendeu mais unidades na Loja Norte em setembro de 2026?",
+    "resposta": "**Rafael Moura vendeu mais unidades na Loja Norte em setembro de 2026 (20 unidades).**",
+    "numeros": [
+     {
+      "rotulo": "unidades",
+      "valor": 20,
+      "unidade": "unidades",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "vendedor",
+      "unidades"
+     ],
+     "linhas": [
+      {
+       "vendedor": "Rafael Moura",
+       "unidades": 20
+      }
+     ],
+     "sql": "SELECT vendedor, sum(quantidade) AS unidades\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date AND loja = ANY($3::text[])\nGROUP BY vendedor\nORDER BY unidades DESC NULLS LAST, vendedor\nLIMIT $4",
+     "truncado": false
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [
+        "vendedor"
+       ],
+       "ate": "2026-09-30",
+       "de": "2026-09-01",
+       "filtros": {
+        "loja": [
+         "Loja Norte"
+        ]
+       },
+       "limite": 1,
+       "metricas": [
+        "unidades"
+       ],
+       "ordem": "desc",
+       "ordenar_por": "unidades"
+      },
+      "sql": "SELECT vendedor, sum(quantidade) AS unidades\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date AND loja = ANY($3::text[])\nGROUP BY vendedor\nORDER BY unidades DESC NULLS LAST, vendedor\nLIMIT $4",
+      "parametros": [
+       "2026-09-01",
+       "2026-09-30",
+       [
+        "Loja Norte"
+       ],
+       1
+      ],
+      "colunas": [
+       "vendedor",
+       "unidades"
+      ],
+      "linhas": [
+       {
+        "vendedor": "Rafael Moura",
+        "unidades": 20
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 31
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-20b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 2,
+     "tokensEntrada": 4551,
+     "tokensSaida": 162,
+     "tokensTotal": 4713,
+     "latenciaMs": 22091,
+     "esperaCotaMs": 21040
+    }
+   }
+  },
+  {
+   "id": "r05",
+   "tipo": "ranking",
+   "pergunta": "Qual forma de pagamento tem o maior desconto médio?",
+   "esperado": [
+    [
+     "A vista"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Qual forma de pagamento tem o maior desconto médio?",
+    "resposta": "**A vista tem o maior desconto médio (4,99 %).**",
+    "numeros": [
+     {
+      "rotulo": "desconto_medio_pct",
+      "valor": 4.99,
+      "unidade": "%",
+      "conferido": true
+     }
+    ],
+    "limitacoes": "Não há dados de desconto médio para Consorcio, apenas 0 %.",
+    "tabela": {
+     "colunas": [
+      "forma_pagamento",
+      "desconto_medio_pct"
+     ],
+     "linhas": [
+      {
+       "forma_pagamento": "A vista",
+       "desconto_medio_pct": 4.99
+      },
+      {
+       "forma_pagamento": "Financiado",
+       "desconto_medio_pct": 1.77
+      },
+      {
+       "forma_pagamento": "Consorcio",
+       "desconto_medio_pct": 0
+      }
+     ],
+     "sql": "SELECT forma_pagamento, round(100 * sum(desconto_total) / nullif(sum(quantidade * preco_tabela), 0), 2) AS desconto_medio_pct\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nGROUP BY forma_pagamento\nORDER BY desconto_medio_pct DESC NULLS LAST, forma_pagamento\nLIMIT $3",
+     "truncado": false
+    },
+    "grafico": {
+     "tipo": "barra",
+     "x": "forma_pagamento",
+     "y": "desconto_medio_pct"
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [
+        "forma_pagamento"
+       ],
+       "ate": "2026-09-30",
+       "de": "2024-10-01",
+       "metricas": [
+        "desconto_medio_pct"
+       ],
+       "ordem": "desc",
+       "ordenar_por": "desconto_medio_pct"
+      },
+      "sql": "SELECT forma_pagamento, round(100 * sum(desconto_total) / nullif(sum(quantidade * preco_tabela), 0), 2) AS desconto_medio_pct\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nGROUP BY forma_pagamento\nORDER BY desconto_medio_pct DESC NULLS LAST, forma_pagamento\nLIMIT $3",
+      "parametros": [
+       "2024-10-01",
+       "2026-09-30",
+       50
+      ],
+      "colunas": [
+       "forma_pagamento",
+       "desconto_medio_pct"
+      ],
+      "linhas": [
+       {
+        "forma_pagamento": "A vista",
+        "desconto_medio_pct": 4.99
+       },
+       {
+        "forma_pagamento": "Financiado",
+        "desconto_medio_pct": 1.77
+       },
+       {
+        "forma_pagamento": "Consorcio",
+        "desconto_medio_pct": 0
+       }
+      ],
+      "totalLinhas": 3,
+      "truncado": false,
+      "duracaoMs": 39
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-20b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 2,
+     "tokensEntrada": 4773,
+     "tokensSaida": 187,
+     "tokensTotal": 4960,
+     "latenciaMs": 35830,
+     "esperaCotaMs": 34236
+    }
+   }
+  },
+  {
+   "id": "c02",
+   "tipo": "comparacao",
+   "pergunta": "A Loja Litoral bateu a meta em julho, agosto e setembro de 2026?",
+   "esperado": [
+    [
+     "3"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "A Loja Litoral bateu a meta em julho, agosto e setembro de 2026?",
+    "resposta": "**Não, a Loja Litoral não bateu a meta em julho, agosto e setembro de 2026.**\n- Julho: 79,1 % da meta (34/43 unidades).\n- Agosto: 75,6 % da meta (34/45 unidades).\n- Setembro: 72,1 % da meta (31/43 unidades).\nSugestão: analisar a meta de unidades para cada mês.",
+    "numeros": [
+     {
+      "rotulo": "meta_unidades",
+      "valor": 43,
+      "unidade": "unidades",
+      "conferido": true
+     },
+     {
+      "rotulo": "unidades",
+      "valor": 34,
+      "unidade": "unidades",
+      "conferido": true
+     },
+     {
+      "rotulo": "atingimento_meta_pct",
+      "valor": 79.1,
+      "unidade": "%",
+      "conferido": true
+     },
+     {
+      "rotulo": "meta_unidades",
+      "valor": 45,
+      "unidade": "unidades",
+      "conferido": true
+     },
+     {
+      "rotulo": "unidades",
+      "valor": 34,
+      "unidade": "unidades",
+      "conferido": true
+     },
+     {
+      "rotulo": "atingimento_meta_pct",
+      "valor": 75.6,
+      "unidade": "%",
+      "conferido": true
+     },
+     {
+      "rotulo": "meta_unidades",
+      "valor": 43,
+      "unidade": "unidades",
+      "conferido": true
+     },
+     {
+      "rotulo": "unidades",
+      "valor": 31,
+      "unidade": "unidades",
+      "conferido": true
+     },
+     {
+      "rotulo": "atingimento_meta_pct",
+      "valor": 72.1,
+      "unidade": "%",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "mes",
+      "meta_unidades",
+      "unidades",
+      "atingimento_meta_pct"
+     ],
+     "linhas": [
+      {
+       "mes": "2026-07-01",
+       "meta_unidades": 43,
+       "unidades": 34,
+       "atingimento_meta_pct": 79.1
+      },
+      {
+       "mes": "2026-08-01",
+       "meta_unidades": 45,
+       "unidades": 34,
+       "atingimento_meta_pct": 75.6
+      },
+      {
+       "mes": "2026-09-01",
+       "meta_unidades": 43,
+       "unidades": 31,
+       "atingimento_meta_pct": 72.1
+      }
+     ],
+     "sql": "SELECT mes, sum(meta_unidades) AS meta_unidades, sum(unidades_vendidas) AS unidades, round(100.0 * sum(unidades_vendidas) / nullif(sum(meta_unidades), 0), 1) AS atingimento_meta_pct\nFROM ia.desempenho_lojas\nWHERE mes BETWEEN date_trunc('month', $1::date) AND $2::date AND loja = ANY($3::text[])\nGROUP BY mes\nORDER BY mes ASC NULLS LAST, mes\nLIMIT $4",
+     "truncado": false
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [
+        "mes"
+       ],
+       "de": "2026-07-01",
+       "ate": "2026-09-30",
+       "filtros": {
+        "loja": [
+         "Loja Litoral"
+        ]
+       },
+       "metricas": [
+        "meta_unidades",
+        "unidades_vendidas",
+        "atingimento_meta_pct"
+       ],
+       "ordem": "asc",
+       "ordenar_por": "mes"
+      },
+      "erro": "Pedido inválido. metricas.1: Opção inválida: esperava uma das seguintes opções: \"faturamento\"|\"unidades\"|\"numero_vendas\"|\"ticket_medio\"|\"desconto_medio_pct\"|\"participacao_unidades_pct\"|\"participacao_faturamento_pct\"|\"meta_unidades\"|\"atingimento_meta_pct\"",
+      "duracaoMs": 1
+     },
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [
+        "mes"
+       ],
+       "ate": "2026-09-30",
+       "de": "2026-07-01",
+       "filtros": {
+        "loja": [
+         "Loja Litoral"
+        ]
+       },
+       "metricas": [
+        "meta_unidades",
+        "unidades",
+        "atingimento_meta_pct"
+       ],
+       "ordem": "asc",
+       "ordenar_por": "mes"
+      },
+      "sql": "SELECT mes, sum(meta_unidades) AS meta_unidades, sum(unidades_vendidas) AS unidades, round(100.0 * sum(unidades_vendidas) / nullif(sum(meta_unidades), 0), 1) AS atingimento_meta_pct\nFROM ia.desempenho_lojas\nWHERE mes BETWEEN date_trunc('month', $1::date) AND $2::date AND loja = ANY($3::text[])\nGROUP BY mes\nORDER BY mes ASC NULLS LAST, mes\nLIMIT $4",
+      "parametros": [
+       "2026-07-01",
+       "2026-09-30",
+       [
+        "Loja Litoral"
+       ],
+       50
+      ],
+      "colunas": [
+       "mes",
+       "meta_unidades",
+       "unidades",
+       "atingimento_meta_pct"
+      ],
+      "linhas": [
+       {
+        "mes": "2026-07-01",
+        "meta_unidades": 43,
+        "unidades": 34,
+        "atingimento_meta_pct": 79.1
+       },
+       {
+        "mes": "2026-08-01",
+        "meta_unidades": 45,
+        "unidades": 34,
+        "atingimento_meta_pct": 75.6
+       },
+       {
+        "mes": "2026-09-01",
+        "meta_unidades": 43,
+        "unidades": 31,
+        "atingimento_meta_pct": 72.1
+       }
+      ],
+      "totalLinhas": 3,
+      "truncado": false,
+      "duracaoMs": 32
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-20b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 3,
+     "tokensEntrada": 7361,
+     "tokensSaida": 608,
+     "tokensTotal": 7969,
+     "latenciaMs": 61536,
+     "esperaCotaMs": 59070
+    }
+   }
+  },
+  {
+   "id": "c03",
+   "tipo": "comparacao",
+   "pergunta": "Vendemos mais carros de janeiro a setembro de 2026 do que no mesmo período de 2025? Quantos em cada ano?",
+   "esperado": [
+    [
+     "2440",
+     "2306"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Vendemos mais carros de janeiro a setembro de 2026 do que no mesmo período de 2025? Quantos em cada ano?",
+    "resposta": "**Sim, vendemos mais carros de janeiro a setembro de 2026 (2.440 unidades) do que no mesmo período de 2025 (2.306 unidades).**\n- Em 2025, o total foi de 2.306 unidades.\n- Em 2026, o total foi de 2.440 unidades.\n- A diferença é de 134 unidades a mais em 2026.\nSugestão: comparar a variação mensal entre os anos para identificar meses de maior crescimento.",
+    "numeros": [
+     {
+      "rotulo": "Unidades 2025",
+      "valor": 2306,
+      "unidade": "unidades",
+      "conferido": true
+     },
+     {
+      "rotulo": "Unidades 2026",
+      "valor": 2440,
+      "unidade": "unidades",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "unidades"
+     ],
+     "linhas": [
+      {
+       "unidades": 2440
+      }
+     ],
+     "sql": "SELECT sum(quantidade) AS unidades\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nLIMIT $3",
+     "truncado": false
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [],
+       "ate": "2025-09-30",
+       "de": "2025-01-01",
+       "limite": 1,
+       "metricas": [
+        "unidades"
+       ]
+      },
+      "sql": "SELECT sum(quantidade) AS unidades\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nLIMIT $3",
+      "parametros": [
+       "2025-01-01",
+       "2025-09-30",
+       1
+      ],
+      "colunas": [
+       "unidades"
+      ],
+      "linhas": [
+       {
+        "unidades": 2306
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 28
+     },
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [],
+       "ate": "2026-09-30",
+       "de": "2026-01-01",
+       "limite": 1,
+       "metricas": [
+        "unidades"
+       ]
+      },
+      "sql": "SELECT sum(quantidade) AS unidades\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nLIMIT $3",
+      "parametros": [
+       "2026-01-01",
+       "2026-09-30",
+       1
+      ],
+      "colunas": [
+       "unidades"
+      ],
+      "linhas": [
+       {
+        "unidades": 2440
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 11
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-20b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 3,
+     "tokensEntrada": 7205,
+     "tokensSaida": 341,
+     "tokensTotal": 7546,
+     "latenciaMs": 26067,
+     "esperaCotaMs": 24051
+    }
+   }
+  }
+ ],
+ "banco_antes": "262586276cd78911363da7e5b91f5004:2186a0046cec09ec8e5010eb44dca29efd82bf685690c35bce796918ca6ae4e68",
+ "banco_depois": "262586276cd78911363da7e5b91f5004:2186a0046cec09ec8e5010eb44dca29efd82bf685690c35bce796918ca6ae4e68",
+ "banco_intacto": true,
+ "fim": "2026-10-05T11:25:34.861601+00:00",
+ "resumo": {
+  "perguntas": 6,
+  "acertos": 6,
+  "taxa_acerto": 100.0,
+  "por_tipo": {
+   "numero": {
+    "total": 2,
+    "acertos": 2
+   },
+   "ranking": {
+    "total": 2,
+    "acertos": 2
+   },
+   "comparacao": {
+    "total": 2,
+    "acertos": 2
+   }
+  },
+  "latencia_ms": {
+   "p50": 26067,
+   "p95": 61536
+  },
+  "tokens": {
+   "media": 5814.0,
+   "total": 34882
+  },
+  "voltas_media": 2.33,
+  "numeros_citados": 15,
+  "numeros_conferidos_pct": 100.0,
+  "ferramentas": {
+   "consultar_metrica": 8
+  }
+ }
+}

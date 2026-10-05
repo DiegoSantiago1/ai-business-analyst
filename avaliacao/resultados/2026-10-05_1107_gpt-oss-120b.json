@@ -1,0 +1,214 @@
+{
+ "modelo": "openai/gpt-oss-120b",
+ "inicio": "2026-10-05T11:07:05.862362+00:00",
+ "itens": [
+  {
+   "id": "n01",
+   "tipo": "numero",
+   "pergunta": "Quantos carros vendemos este mês?",
+   "esperado": [
+    [
+     "283"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Quantos carros vendemos este mês?",
+    "resposta": "**283 unidades**\n- Total de unidades vendidas em setembro de 2026.\n- Comparado ao mês anterior (agosto 2026), houve variação que pode ser analisada.\n- Se desejar, podemos comparar com a meta de unidades para este mês.\n\n**Sugestão:** Quer saber o atingimento da meta de unidades para setembro/2026?",
+    "numeros": [
+     {
+      "rotulo": "unidades vendidas",
+      "valor": 283,
+      "unidade": "unidades",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "unidades"
+     ],
+     "linhas": [
+      {
+       "unidades": 283
+      }
+     ],
+     "sql": "SELECT sum(quantidade) AS unidades\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nLIMIT $3",
+     "truncado": false
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "ate": "2026-09-30",
+       "de": "2026-09-01",
+       "metricas": [
+        "unidades"
+       ]
+      },
+      "sql": "SELECT sum(quantidade) AS unidades\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nLIMIT $3",
+      "parametros": [
+       "2026-09-01",
+       "2026-09-30",
+       50
+      ],
+      "colunas": [
+       "unidades"
+      ],
+      "linhas": [
+       {
+        "unidades": 283
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 22
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-120b",
+     "versaoPrompt": "v5-detalhada",
+     "voltas": 3,
+     "tokensEntrada": 6917,
+     "tokensSaida": 341,
+     "tokensTotal": 7258,
+     "latenciaMs": 4492,
+     "esperaCotaMs": 0
+    }
+   }
+  },
+  {
+   "id": "n02",
+   "tipo": "numero",
+   "pergunta": "Qual foi o faturamento total de 2025?",
+   "esperado": [
+    [
+     "485267640.00"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Qual foi o faturamento total de 2025?",
+    "resposta": "**R$ 485.267.640,00**\n- O faturamento de 2025 foi significativamente maior que o de 2024, que foi de R$ 124.217.450,00.\n- Comparado ao objetivo anual típico da rede (não disponível), o valor indica forte desempenho.\n- Não há variação mensal detalhada, mas o total anual mostra crescimento.\n\nSugestão: Deseja analisar o faturamento por loja ou por linha de modelo em 2025?",
+    "numeros": [
+     {
+      "rotulo": "Faturamento 2025",
+      "valor": 485267640,
+      "unidade": "R$",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "faturamento"
+     ],
+     "linhas": [
+      {
+       "faturamento": 124217450
+      }
+     ],
+     "sql": "SELECT round(sum(valor_total), 2) AS faturamento\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nLIMIT $3",
+     "truncado": false
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "ate": "2025-12-31",
+       "de": "2025-01-01",
+       "metricas": [
+        "faturamento"
+       ]
+      },
+      "sql": "SELECT round(sum(valor_total), 2) AS faturamento\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nLIMIT $3",
+      "parametros": [
+       "2025-01-01",
+       "2025-12-31",
+       50
+      ],
+      "colunas": [
+       "faturamento"
+      ],
+      "linhas": [
+       {
+        "faturamento": 485267640
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 31
+     },
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "ate": "2024-12-31",
+       "de": "2024-01-01",
+       "metricas": [
+        "faturamento"
+       ]
+      },
+      "sql": "SELECT round(sum(valor_total), 2) AS faturamento\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nLIMIT $3",
+      "parametros": [
+       "2024-01-01",
+       "2024-12-31",
+       50
+      ],
+      "colunas": [
+       "faturamento"
+      ],
+      "linhas": [
+       {
+        "faturamento": 124217450
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 32
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-120b",
+     "versaoPrompt": "v5-detalhada",
+     "voltas": 4,
+     "tokensEntrada": 9395,
+     "tokensSaida": 489,
+     "tokensTotal": 9884,
+     "latenciaMs": 61785,
+     "esperaCotaMs": 55825
+    }
+   }
+  }
+ ],
+ "banco_antes": "262586276cd78911363da7e5b91f5004:2186a0046cec09ec8e5010eb44dca29efd82bf685690c35bce796918ca6ae4e68",
+ "banco_depois": "262586276cd78911363da7e5b91f5004:2186a0046cec09ec8e5010eb44dca29efd82bf685690c35bce796918ca6ae4e68",
+ "banco_intacto": true,
+ "fim": "2026-10-05T11:08:51.771963+00:00",
+ "resumo": {
+  "perguntas": 2,
+  "acertos": 2,
+  "taxa_acerto": 100.0,
+  "por_tipo": {
+   "numero": {
+    "total": 2,
+    "acertos": 2
+   }
+  },
+  "latencia_ms": {
+   "p50": 4492,
+   "p95": 61785
+  },
+  "tokens": {
+   "media": 8571.0,
+   "total": 17142
+  },
+  "voltas_media": 3.5,
+  "numeros_citados": 2,
+  "numeros_conferidos_pct": 100.0,
+  "ferramentas": {
+   "consultar_metrica": 3
+  }
+ }
+}
