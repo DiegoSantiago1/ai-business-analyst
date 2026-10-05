@@ -31,7 +31,8 @@ function normalizarNumeros(valor: unknown): unknown {
 
 export const esquemaResposta = z
   .object({
-    resposta: z.string().trim().min(1).max(2_000),
+    // Até 3 mil caracteres: o modo detalhado (v5) tem tópicos de contexto e sugestão.
+    resposta: z.string().trim().min(1).max(3_000),
     // O modelo às vezes manda o valor como texto ("72,1") ou põe uma data em numeros
     // (medido no 20b, 05/10/2026). Texto numérico vira número; o que não é número sai do
     // cartão (a resposta em texto continua citando). Sem isso, uma volta de correção.
@@ -78,7 +79,12 @@ export const esquemaResposta = z
           .strict(),
       )
       .optional(),
-    limitacoes: z.string().trim().max(600).optional(),
+    limitacoes: z
+      .string()
+      .trim()
+      .max(600)
+      .nullish()
+      .transform((texto) => texto || undefined),
   })
   .strict();
 export type RespostaModelo = z.infer<typeof esquemaResposta>;

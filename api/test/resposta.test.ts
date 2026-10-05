@@ -152,3 +152,9 @@ test("numeroDeTexto", () => {
   assert.equal(numeroDeTexto("7.5"), 7.5);
   assert.equal(numeroDeTexto("31/03/2026"), undefined);
 });
+
+test("limitacoes null ou vazia vira ausente", () => {
+  assert.equal(esquemaResposta.parse({ resposta: "ok", limitacoes: null }).limitacoes, undefined);
+  assert.equal(esquemaResposta.parse({ resposta: "ok", limitacoes: "" }).limitacoes, undefined);
+  assert.equal(esquemaResposta.parse({ resposta: "ok", limitacoes: "x" }).limitacoes, "x");
+});

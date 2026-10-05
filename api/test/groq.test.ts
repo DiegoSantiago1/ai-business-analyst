@@ -323,3 +323,23 @@ describe("geração malformada que não dá para recuperar (120b: 'response' com
     assert.equal(r.mensagem.tool_calls, undefined);
   });
 });
+
+describe("gerações reais do 120b no modo detalhado (05/10/2026)", () => {
+  const nomes = ["consultar_metrica", "responder"];
+  test("objeto de argumentos sem envelope vira chamada de responder", () => {
+    const solto = JSON.stringify({
+      grafico: { tipo: "nenhum" },
+      limitacoes: "",
+      numeros: [],
+      resposta: "**ok**",
+    });
+    const c = recuperarChamada(solto, nomes);
+    assert.equal(c?.function.name, "responder");
+    assert.equal(JSON.parse(c?.function.arguments ?? "{}").resposta, "**ok**");
+  });
+  test("objeto sem campo conhecido não é recuperado", () => {
+    assert.equal(recuperarChamada(JSON.stringify({ x: 1 }), nomes), undefined);
+    assert.equal(recuperarChamada(JSON.stringify([1, 2]), nomes), undefined);
+    assert.equal(recuperarChamada(JSON.stringify({ name: 5, arguments: {} }), nomes), undefined);
+  });
+});

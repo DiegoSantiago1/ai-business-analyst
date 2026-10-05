@@ -120,7 +120,8 @@ export const FERRAMENTAS: DefinicaoFerramenta[] = [
               y: { type: "string" },
             },
           },
-          limitacoes: { type: "string", description: "Ressalvas, se houver" },
+          // null aceito: o 120b manda "limitacoes": null, e o Groq recusaria a chamada inteira.
+          limitacoes: { type: ["string", "null"], description: "Ressalvas, se houver" },
         },
       },
     },

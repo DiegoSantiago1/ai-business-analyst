@@ -113,9 +113,15 @@ export function recuperarChamada(
   } catch {
     return undefined;
   }
-  const { name, arguments: args } = (bruto ?? {}) as { name?: unknown; arguments?: unknown };
-  if (typeof name !== "string") return undefined;
-  const limpo = name.replace(/<\|[^|]*\|>.*$/s, "").trim();
+  if (!bruto || typeof bruto !== "object" || Array.isArray(bruto)) return undefined;
+  // Formato normal: {"name": ..., "arguments": {...}}. Medido no 120b (05/10/2026): às vezes
+  // vem só o objeto de argumentos, sem envelope ("Tool choice is required, but model did not
+  // call a tool"); aí a ferramenta é deduzida pelos campos.
+  const comEnvelope = "name" in bruto;
+  const { name, arguments: argsEnvelope } = bruto as { name?: unknown; arguments?: unknown };
+  const args = comEnvelope ? argsEnvelope : bruto;
+  if (comEnvelope && typeof name !== "string") return undefined;
+  const limpo = typeof name === "string" ? name.replace(/<\|[^|]*\|>.*$/s, "").trim() : "";
   // O gpt-oss-120b às vezes chama a resposta final de "json" (medido em 05/10/2026), com
   // os argumentos certos. Nome desconhecido: a ferramenta é deduzida pelos campos.
   const nome = nomesValidos.includes(limpo) ? limpo : deduzirFerramenta(args);
@@ -168,11 +174,11 @@ export class ClienteGroq implements ProvedorIA {
       // Os gpt-oss não fazem chamadas paralelas; o loop trata uma ferramenta por volta.
       parallel_tool_calls: false,
       temperature: 0,
-      max_completion_tokens: this.#o.maxTokensSaida,
+      max_completion_tokens: pedido.maxTokensSaida ?? this.#o.maxTokensSaida,
       reasoning_effort: this.#o.esforco,
       include_reasoning: false,
     });
-    const necessarios = estimarTokens(corpo) + this.#o.maxTokensSaida;
+    const necessarios = estimarTokens(corpo) + (pedido.maxTokensSaida ?? this.#o.maxTokensSaida);
 
     let esperado = 0;
     let erros = 0;
