@@ -40,7 +40,9 @@ try {
     ...(process.argv.includes("--depurar") ? { fetch: depurar, esperar: esperarDepurando } : {}),
   });
   const contexto = { pool, vocabulario: await carregarVocabulario(pool) };
-  const r = await perguntar(pergunta, provedor, contexto);
+  const r = await perguntar(pergunta, provedor, contexto, [], {
+    detalhada: process.argv.includes("--detalhada"),
+  });
   if (process.argv.includes("--json")) {
     console.log(JSON.stringify(r, null, 2));
   } else {

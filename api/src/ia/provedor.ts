@@ -29,6 +29,8 @@ export interface PedidoIA {
   mensagens: Mensagem[];
   ferramentas: DefinicaoFerramenta[];
   escolha: EscolhaFerramenta;
+  /** Limite de tokens gerados nesta volta (resposta detalhada precisa de mais). */
+  maxTokensSaida?: number;
 }
 
 export interface Uso {

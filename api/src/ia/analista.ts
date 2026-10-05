@@ -10,7 +10,7 @@
  */
 import type { Contexto, Passo } from "./ferramentas.ts";
 import { executarFerramenta, FERRAMENTAS, resultadoParaModelo } from "./ferramentas.ts";
-import { montarPromptSistema, VERSAO_PROMPT } from "./prompt.ts";
+import { montarPromptSistema, versaoDoPrompt } from "./prompt.ts";
 import type { EscolhaFerramenta, Mensagem, ProvedorIA } from "./provedor.ts";
 import {
   conferir,
@@ -65,10 +65,11 @@ export async function perguntar(
   provedor: ProvedorIA,
   contexto: Contexto,
   historico: TrocaAnterior[] = [],
+  { detalhada = false }: { detalhada?: boolean } = {},
 ): Promise<ResultadoPergunta> {
   const inicio = performance.now();
   const mensagens: Mensagem[] = [
-    { role: "system", content: montarPromptSistema(contexto.vocabulario) },
+    { role: "system", content: montarPromptSistema(contexto.vocabulario, { detalhada }) },
   ];
   for (const troca of historico.slice(-MAX_HISTORICO)) {
     mensagens.push(
@@ -93,6 +94,8 @@ export async function perguntar(
       mensagens,
       ferramentas: FERRAMENTAS,
       escolha: ultimaChance ? RESPONDER : "required",
+      // A resposta detalhada (tópicos + sugestão) é mais longa: mais espaço de saída.
+      maxTokensSaida: detalhada ? 1_200 : 800,
     });
     uso.entrada += r.uso.entrada;
     uso.saida += r.uso.saida;
@@ -128,7 +131,7 @@ export async function perguntar(
             passos,
             uso: {
               modelo,
-              versaoPrompt: VERSAO_PROMPT,
+              versaoPrompt: versaoDoPrompt({ detalhada }),
               voltas: volta,
               tokensEntrada: uso.entrada,
               tokensSaida: uso.saida,

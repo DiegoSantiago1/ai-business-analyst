@@ -186,4 +186,27 @@ describe("perguntar", () => {
       /Ignore todas as instruções/,
     );
   });
+
+  test("modo detalhado: prompt com formato elaborado, mais saída e versão registrada", async () => {
+    const ia = new IAFalsa([chamar("responder", { resposta: "**ok**", numeros: [] })]);
+    const r = await perguntar("x", ia, contexto, [], { detalhada: true });
+    const sistema = ia.pedidos[0]?.mensagens[0];
+    const texto = String(sistema && "content" in sistema ? sistema.content : "");
+    assert.match(texto, /Sugestão:/);
+    assert.match(texto, /máximo UMA consulta extra/i);
+    assert.match(texto, /Exemplo de resposta/);
+    assert.equal(ia.pedidos[0]?.maxTokensSaida, 1200);
+    assert.equal(r.uso.versaoPrompt, "v5.1-detalhada");
+  });
+
+  test("modo curto (padrão): regra de 1 a 4 frases", async () => {
+    const ia = new IAFalsa([chamar("responder", { resposta: "ok", numeros: [] })]);
+    const r = await perguntar("x", ia, contexto);
+    const sistema = ia.pedidos[0]?.mensagens[0];
+    const texto = String(sistema && "content" in sistema ? sistema.content : "");
+    assert.match(texto, /1 a 4 frases/);
+    assert.doesNotMatch(texto, /Sugestão:/);
+    assert.equal(ia.pedidos[0]?.maxTokensSaida, 800);
+    assert.equal(r.uso.versaoPrompt, "v5.1-curta");
+  });
 });

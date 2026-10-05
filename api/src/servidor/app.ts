@@ -39,9 +39,11 @@ const esquemaPergunta = z
   .object({
     pergunta: z.string().trim().min(3).max(500),
     historico: z
-      .array(z.object({ pergunta: z.string().max(500), resposta: z.string().max(2_000) }).strict())
+      .array(z.object({ pergunta: z.string().max(500), resposta: z.string().max(3_000) }).strict())
       .max(3)
       .default([]),
+    // Resposta elaborada (contexto + sugestão): a interface liga por padrão na demonstração.
+    detalhada: z.boolean().default(false),
   })
   .strict();
 
@@ -139,10 +141,12 @@ export function criarApp(d: Dependencias): express.Express {
       });
     }
 
-    const { pergunta, historico } = lido.data;
+    const { pergunta, historico, detalhada } = lido.data;
     const inicio = performance.now();
     try {
-      const r = await fila.executar(() => perguntar(pergunta, d.provedor, d.contexto, historico));
+      const r = await fila.executar(() =>
+        perguntar(pergunta, d.provedor, d.contexto, historico, { detalhada }),
+      );
       d.orcamento.registrar(r.uso.modelo, r.uso.tokensTotal);
       await d.registro.gravar({
         pergunta,
