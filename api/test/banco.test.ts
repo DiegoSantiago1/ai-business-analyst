@@ -6,10 +6,10 @@
 import assert from "node:assert/strict";
 import { after, describe, test } from "node:test";
 import type { DatabaseError } from "pg";
-import { criarPool, MAX_CONEXOES } from "../src/banco.ts";
-import { carregarConfigBanco } from "../src/config.ts";
+import { MAX_CONEXOES } from "../src/banco.ts";
+import { criarPoolDeTeste } from "./apoio.ts";
 
-const pool = criarPool(carregarConfigBanco(undefined, { teste: true }));
+const pool = criarPoolDeTeste();
 after(() => pool.end());
 
 // Códigos SQLSTATE do PostgreSQL.
