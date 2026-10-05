@@ -1,0 +1,36 @@
+{
+  "name": "ai-business-analyst-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Interface do AI Business Analyst: chat com resposta, números conferidos, SQL, tabela e gráfico.",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "typecheck": "tsc",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "verificar": "npm run lint && npm run typecheck && npm test && vite build"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "@tailwindcss/vite": "4.3.3",
+    "@types/node": "24.19.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "tailwindcss": "4.3.3",
+    "typescript": "7.0.2",
+    "vite": "8.3.2"
+  }
+}

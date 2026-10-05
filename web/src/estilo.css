@@ -1,0 +1,127 @@
+@import "tailwindcss";
+
+/*
+ * Identidade do Projeto 5 (diferente dos Projetos 3 e 4): grafite + verde-limão,
+ * Bricolage Grotesque (títulos), IBM Plex Sans (texto) e IBM Plex Mono (SQL).
+ * Cores de dados validadas com o script do dataviz (claro e escuro, 04/10/2026):
+ *   claro  #4f8a10 / #2f6fd6 sobre #f6f7f9    escuro  #6fa324 / #5a8ff0 sobre #17181c
+ */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  color-scheme: light;
+  --fundo: #e8eaed;
+  --superficie: #f6f7f9;
+  --superficie-2: #ffffff;
+  --linha: #d5d9de;
+  --grade: #e2e5e9;
+  --tinta: #111316;
+  --tinta-2: #4a4f57;
+  --tinta-3: #656b74;
+  --acento: #3f6f0c;
+  --limao: #c5f03a;
+  --serie-1: #4f8a10;
+  --serie-2: #2f6fd6;
+  --bom: #0a7a0a;
+  --aviso: #8a5a00;
+  --critico: #b42727;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --fundo: #0f1013;
+    --superficie: #17181c;
+    --superficie-2: #1e2025;
+    --linha: #2b2e35;
+    --grade: #24272d;
+    --tinta: #eef0f3;
+    --tinta-2: #b4b9c2;
+    --tinta-3: #8f95a0;
+    --acento: #9bd83a;
+    --serie-1: #6fa324;
+    --serie-2: #5a8ff0;
+    --bom: #3fbf3f;
+    --aviso: #fab219;
+    --critico: #f07070;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --fundo: #0f1013;
+  --superficie: #17181c;
+  --superficie-2: #1e2025;
+  --linha: #2b2e35;
+  --grade: #24272d;
+  --tinta: #eef0f3;
+  --tinta-2: #b4b9c2;
+  --tinta-3: #8f95a0;
+  --acento: #9bd83a;
+  --serie-1: #6fa324;
+  --serie-2: #5a8ff0;
+  --bom: #3fbf3f;
+  --aviso: #fab219;
+  --critico: #f07070;
+}
+
+@theme {
+  --font-titulo: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+  --color-fundo: var(--fundo);
+  --color-superficie: var(--superficie);
+  --color-superficie-2: var(--superficie-2);
+  --color-linha: var(--linha);
+  --color-tinta: var(--tinta);
+  --color-tinta-2: var(--tinta-2);
+  --color-tinta-3: var(--tinta-3);
+  --color-acento: var(--acento);
+  --color-limao: var(--limao);
+  --color-bom: var(--bom);
+  --color-aviso: var(--aviso);
+  --color-critico: var(--critico);
+}
+
+html {
+  background: var(--fundo);
+  color: var(--tinta);
+  font-family: var(--font-sans);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  min-height: 100dvh;
+}
+
+:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: a preferência do usuário por menos movimento precisa vencer qualquer animação */
+    animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: idem */
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes pulso {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.pulso {
+  animation: pulso 1.2s ease-in-out infinite;
+}

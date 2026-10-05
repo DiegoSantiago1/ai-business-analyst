@@ -47,12 +47,15 @@ jobs:
         with:
           node-version: "24"
           cache: npm
-          cache-dependency-path: api/package-lock.json
+          cache-dependency-path: |
+            api/package-lock.json
+            web/package-lock.json
 
       - name: Instalar dependências
         run: |
           pip install -r requirements-dev.txt
           npm ci --prefix api
+          npm ci --prefix web
 
       # O mesmo bootstrap.sql do ambiente local (usuários sem privilégios extras, fuso,
       # REVOKE do PUBLIC, travas do usuário da IA), com as variáveis passadas pelo -v.
@@ -80,4 +83,8 @@ jobs:
 
       - name: API - lint, tipos e testes
         working-directory: api
+        run: npm run verificar
+
+      - name: Interface - lint, tipos, testes e build
+        working-directory: web
         run: npm run verificar
