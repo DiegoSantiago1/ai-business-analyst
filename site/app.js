@@ -16,6 +16,7 @@ const DICIONARIO = {
     "hero.texto":
       "An AI data analyst for a car dealership network (100% fictional data). The AI picks tools, queries PostgreSQL read-only and answers with checkable numbers: every value comes with the SQL that produced it.",
     "hero.ver": "See a real conversation",
+    "hero.aoVivo": "Try it live",
     "hero.codigo": "Code on GitHub",
     "prob.titulo": "The problem",
     "prob.lead":
@@ -551,6 +552,10 @@ function graficoLinha(container, { rotulos, valores, formatar, titulo }) {
 
 // ------------------------------------------------------------------ hero e avaliação
 function renderHero() {
+  // Versão ao vivo: só aparece quando há um endereço publicado (nunca um link quebrado).
+  const aoVivo = document.getElementById("ao-vivo");
+  aoVivo.hidden = !dados.url_ao_vivo;
+  if (dados.url_ao_vivo) aoVivo.href = dados.url_ao_vivo;
   const r = dados.avaliacao.resumo;
   const hostis = hostisDeTodas();
   const k = t().kpi;

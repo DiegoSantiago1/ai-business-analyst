@@ -302,6 +302,17 @@ pre {
   color: #111316;
 }
 
+/* Com o botão ao vivo visível, "ver conversa" vira o secundário. */
+#ao-vivo:not([hidden]) + .botao-principal {
+  background: transparent;
+  color: var(--hero-tinta);
+  border: 1px solid rgb(255 255 255 / 25%);
+}
+
+[hidden] {
+  display: none !important;
+}
+
 .botao-secundario {
   border: 1px solid rgb(255 255 255 / 25%);
   color: var(--hero-tinta);
