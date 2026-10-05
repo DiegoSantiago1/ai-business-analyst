@@ -30,7 +30,7 @@ The hard part is not "connect an LLM to a database". It is to do it **without le
 
 ## Results (measured)
 
-Official run: `openai/gpt-oss-120b` (Groq free tier), prompt v3, 05/10/2026.
+Official run: `openai/gpt-oss-120b` (Groq free tier), prompt v3, night of Oct 4–5, 2026 (Recife time).
 
 | Metric | Value |
 |---|---|

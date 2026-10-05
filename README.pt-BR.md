@@ -30,7 +30,7 @@ O difícil não é "ligar um LLM no banco". É fazer isso **sem deixar o modelo 
 
 ## Resultados (medidos)
 
-Rodada oficial: `openai/gpt-oss-120b` (plano gratuito do Groq), prompt v3, 05/10/2026.
+Rodada oficial: `openai/gpt-oss-120b` (plano gratuito do Groq), prompt v3, noite de 04 para 05/10/2026 (horário de Recife).
 
 | Métrica | Valor |
 |---|---|
