@@ -1,0 +1,22 @@
+# Contexto pessoal e de carreira (não vai para o GitHub)
+CLAUDE.md
+
+# Seção de aprendizado (preparação pessoal para entrevista)
+docs/APRENDIZADO.md
+
+# Segredos e ambiente
+.env
+.venv/
+node_modules/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+dist/
+
+# Configuração local do editor
+.vscode/
+
+.DS_Store
