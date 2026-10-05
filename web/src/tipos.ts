@@ -56,6 +56,8 @@ export interface Resultado {
     tokensSaida: number;
     tokensTotal: number;
     latenciaMs: number;
+    /** Parte da latência esperando a cota por minuto do plano gratuito do provedor. */
+    esperaCotaMs?: number;
   };
 }
 

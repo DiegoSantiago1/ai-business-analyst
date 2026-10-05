@@ -161,7 +161,10 @@ function Bastidores({ passos, uso }: { passos: Passo[]; uso: Resultado["uso"] })
           ›
         </span>{" "}
         Como a IA chegou aqui · {passos.length} {passos.length === 1 ? "consulta" : "consultas"} ·{" "}
-        {formatarDuracao(uso.latenciaMs)} · {formatarInteiro(uso.tokensTotal)} tokens
+        {formatarDuracao(uso.latenciaMs)}
+        {(uso.esperaCotaMs ?? 0) >= 1000 &&
+          ` (${formatarDuracao(uso.esperaCotaMs ?? 0)} esperando a cota gratuita)`}{" "}
+        · {formatarInteiro(uso.tokensTotal)} tokens
       </summary>
       <ol className="m-0 list-none space-y-3 px-3 pb-3">
         {passos.map((p, i) => (
