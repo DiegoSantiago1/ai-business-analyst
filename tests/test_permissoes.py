@@ -162,3 +162,12 @@ def test_ia_nao_le_nenhuma_tabela_de_origem(
 ) -> None:
     with pytest.raises(errors.InsufficientPrivilege):
         bd_ia.execute(f"SELECT * FROM vendas.{tabela}")
+
+
+def test_view_atualizavel_continua_protegida(bd_ia: Conexao, banco_carregado: None) -> None:
+    # ia.modelos lê uma tabela só: o PostgreSQL a considera atualizável automaticamente.
+    # Mesmo desligando o somente leitura, a IA não altera nada: ela só tem SELECT.
+    bd_ia.execute("SET default_transaction_read_only = off")
+    bd_ia.commit()
+    with pytest.raises(errors.InsufficientPrivilege):
+        bd_ia.execute("UPDATE ia.modelos SET preco_tabela_atual = 1")
