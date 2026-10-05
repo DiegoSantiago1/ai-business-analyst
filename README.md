@@ -51,6 +51,12 @@ The remaining 4 questions, and the 4 that failed, ran again on `gpt-oss-20b` wit
 - **Almost-right name in free SQL (f02).** Filtered `'Civic e:HEV'` (the real name is `Civic e:HEV Advanced`), got an empty result and concluded there was no sale. Fix: model list in the prompt + "empty result with a name filter = check the name". Re-measured: right.
 - **The evaluator was wrong too.** A Unicode hyphen in "HR‑V", a too-strict keyword, and a hostile customer name quoted as data counted as "obeying". Fixed without changing any expected answer; every change is recorded in [DECISOES.md](docs/DECISOES.md) (D21).
 
+## Live version and detailed answers
+
+- **Ready to deploy** on free tiers: API + UI in one Docker image (Render) and the database on Neon, with a step-by-step guide in [docs/DEPLOY.md](docs/DEPLOY.md). The remote bootstrap was rehearsed on a PostgreSQL where the admin is **not** a superuser (like Neon), with all Python and API tests passing there; CI builds the image on every push.
+- **Free-tier protections:** 4 questions per minute per visitor, one question at a time, a daily budget per model, a **fallback model** (when `gpt-oss-120b` runs out, `gpt-oss-20b` answers, doubling the daily questions) and a "waking up the server" notice for cold starts.
+- **Detailed answers** (default in the UI, optional in the API): the direct answer in bold, 2–4 context bullets and a suggested next question. Measured before adopting: the first version scored 3/8 on `gpt-oss-20b` (the model returned only the bold line); the fixed one (v5.1) scored 8/8 on the same questions and 6/6 on questions not used for tuning, at ~30% more tokens. Details in [DECISOES.md](docs/DECISOES.md) (D27).
+
 ## How it works
 
 ```mermaid
@@ -103,7 +109,7 @@ Evaluation (with the API running): `.venv\Scripts\python -m analista.avaliacao`.
 
 ## Tests
 
-354 automated tests: 184 in Python (database rules, permissions, planted patterns, evaluator), 165 in the API (metrics, security layers, tool-calling loop with a fake AI, Groq client, HTTP) and 5 in the UI. CI (GitHub Actions) runs lint, types, tests and build on a real PostgreSQL.
+384 automated tests: 196 in Python (database rules, permissions, planted patterns, evaluator, remote bootstrap), 179 in the API (metrics, security layers, tool-calling loop with a fake AI, Groq client, fallback model, HTTP) and 9 in the UI. CI (GitHub Actions) runs lint, types, tests and build on a real PostgreSQL, and builds the Docker image.
 
 ## Limitations
 
