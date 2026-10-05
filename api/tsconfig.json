@@ -1,0 +1,23 @@
+{
+  // O Node 24 executa TypeScript direto ("type stripping"): o tsc só confere os tipos
+  // (noEmit) e não existe etapa de build. Por isso só vale sintaxe que pode ser apagada
+  // sem mudar o comportamento (erasableSyntaxOnly: nada de enum nem namespace) e os
+  // imports levam a extensão .ts, que é o arquivo que o Node vai abrir.
+  "compilerOptions": {
+    "target": "es2024",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "types": ["node"],
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["src", "test"]
+}
