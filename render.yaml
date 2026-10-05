@@ -7,7 +7,7 @@ services:
     name: ai-business-analyst
     runtime: docker
     plan: free
-    region: virginia
+    region: ohio
     healthCheckPath: /api/saude
     envVars:
       - key: GROQ_API_KEY

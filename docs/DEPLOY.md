@@ -12,7 +12,7 @@ A versão ao vivo é um container (API Node + interface React) no **Render** e o
 
 ## 1. Banco no Neon (~10 min)
 
-1. Crie a conta em https://neon.com (login com o GitHub) e um projeto: nome `ai-business-analyst`, PostgreSQL 16, região **AWS US East (N. Virginia)**.
+1. Crie a conta em https://neon.com (login com o GitHub) e um projeto: nome `ai-business-analyst`, PostgreSQL 16, região **AWS US East 2 (Ohio)** (o Render também roda em Ohio: banco e chat perto um do outro).
 2. No painel, em **Connect**, copie a *connection string* do usuário dono (`neondb_owner`), com `?sslmode=require`. Esse é o administrador.
 3. No seu computador, na pasta do projeto, crie um arquivo `.env.nuvem` (já ignorado pelo git) com:
 
