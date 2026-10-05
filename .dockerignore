@@ -1,0 +1,8 @@
+# Só api/ e web/ entram na imagem; o resto (Python, dados, segredos) fica de fora.
+*
+!api/package.json
+!api/package-lock.json
+!api/src/**
+!web/**
+web/node_modules
+web/dist

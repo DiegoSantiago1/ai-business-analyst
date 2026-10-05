@@ -88,3 +88,19 @@ jobs:
       - name: Interface - lint, tipos, testes e build
         working-directory: web
         run: npm run verificar
+
+  # A imagem da versão ao vivo (Dockerfile) é construída a cada push, do mesmo jeito que o
+  # Render vai construir: se quebrar, o CI avisa antes do deploy.
+  imagem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Construir a imagem
+        run: docker build -t ai-business-analyst:ci .
+      - name: A imagem roda como usuário sem privilégio e tem a interface
+        run: |
+          test "$(docker run --rm --entrypoint id ai-business-analyst:ci -u)" = "1000"
+          docker run --rm --entrypoint test ai-business-analyst:ci -f /app/web/dist/index.html

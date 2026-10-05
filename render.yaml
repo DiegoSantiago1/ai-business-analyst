@@ -1,0 +1,36 @@
+# Blueprint do Render: versão ao vivo (API + interface num container). O banco é o
+# PostgreSQL gerenciado do Neon (o gratuito do Render apaga o banco em 30 dias).
+# Passo a passo em docs/DEPLOY.md. Variáveis com "sync: false" são segredos: o Render
+# pede o valor na criação e não guarda no repositório.
+services:
+  - type: web
+    name: ai-business-analyst
+    runtime: docker
+    plan: free
+    region: virginia
+    healthCheckPath: /api/saude
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODELO
+        value: openai/gpt-oss-120b
+      # Quando a cota do dia do 120b acaba, as perguntas seguem no 20b.
+      - key: GROQ_MODELO_RESERVA
+        value: openai/gpt-oss-20b
+      - key: ANALISTA_DB_HOST
+        sync: false
+      - key: ANALISTA_DB_PORT
+        value: "5432"
+      - key: ANALISTA_DB_NAME
+        value: vendas_ia
+      - key: ANALISTA_DB_SSL
+        value: "true"
+      - key: ANALISTA_IA_USER
+        value: analista_ia
+      - key: ANALISTA_IA_PASSWORD
+        sync: false
+      - key: ORCAMENTO_DIARIO_TOKENS
+        value: "150000"
+      # Aberto ao público: no máximo 4 perguntas por minuto por visitante.
+      - key: LIMITE_POR_MINUTO
+        value: "4"

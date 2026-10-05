@@ -23,3 +23,6 @@ dist/
 
 # Registro de perguntas da API (tokens, latência), gerado em execução
 api/registros/
+
+# Segredos da versão ao vivo (docs/DEPLOY.md)
+.env.nuvem
