@@ -156,6 +156,7 @@ describe("produção (nuvem)", () => {
   test("modelo reserva: opcional, diferente do principal", () => {
     const base = { GROQ_API_KEY: "gsk_x", GROQ_MODELO: "openai/gpt-oss-120b" };
     assert.equal(carregarConfigIA(base).reserva, undefined);
+    assert.equal(carregarConfigIA({ ...base, GROQ_MODELO_RESERVA: "" }).reserva, undefined);
     assert.equal(
       carregarConfigIA({ ...base, GROQ_MODELO_RESERVA: "openai/gpt-oss-20b" }).reserva,
       "openai/gpt-oss-20b",

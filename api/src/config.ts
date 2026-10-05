@@ -108,7 +108,11 @@ const esquemaIA = z.object({
   GROQ_ESFORCO: z.enum(["low", "medium", "high"]).default("low"),
   // Modelo reserva: quando a cota do dia do principal acaba, as perguntas vão para ele
   // (a cota do Groq é por modelo, então a reserva dobra as perguntas por dia).
-  GROQ_MODELO_RESERVA: z.enum(["openai/gpt-oss-20b", "openai/gpt-oss-120b"]).optional(),
+  GROQ_MODELO_RESERVA: z.preprocess(
+    // Vazio (como no .env.example) = sem reserva.
+    (v) => (v === "" ? undefined : v),
+    z.enum(["openai/gpt-oss-20b", "openai/gpt-oss-120b"]).optional(),
+  ),
 });
 
 type Modelo = "openai/gpt-oss-20b" | "openai/gpt-oss-120b";
