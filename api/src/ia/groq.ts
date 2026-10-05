@@ -78,6 +78,15 @@ export function ehLimiteDiario(mensagem: string | undefined): boolean {
 
 let recuperadas = 0;
 
+/** Ferramenta pelo campo que só ela tem. */
+function deduzirFerramenta(args: unknown): string | undefined {
+  if (!args || typeof args !== "object") return undefined;
+  if ("resposta" in args) return "responder";
+  if ("sql" in args) return "executar_sql";
+  if ("metricas" in args) return "consultar_metrica";
+  return undefined;
+}
+
 /**
  * O gpt-oss no Groq às vezes cola um marcador interno do formato harmony no nome da
  * ferramenta ("responder<|channel|>commentary") e o Groq recusa a chamada com
@@ -98,8 +107,11 @@ export function recuperarChamada(
   }
   const { name, arguments: args } = (bruto ?? {}) as { name?: unknown; arguments?: unknown };
   if (typeof name !== "string") return undefined;
-  const nome = name.replace(/<\|[^|]*\|>.*$/s, "").trim();
-  if (!nomesValidos.includes(nome)) return undefined;
+  const limpo = name.replace(/<\|[^|]*\|>.*$/s, "").trim();
+  // O gpt-oss-120b às vezes chama a resposta final de "json" (medido em 05/10/2026), com
+  // os argumentos certos. Nome desconhecido: a ferramenta é deduzida pelos campos.
+  const nome = nomesValidos.includes(limpo) ? limpo : deduzirFerramenta(args);
+  if (!nome || !nomesValidos.includes(nome)) return undefined;
   recuperadas++;
   return {
     id: `recuperada_${recuperadas}`,

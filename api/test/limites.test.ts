@@ -73,3 +73,21 @@ describe("Fila", () => {
     assert.equal(fila.esperando, 0);
   });
 });
+
+describe("Registro", () => {
+  test("soma os tokens de hoje por modelo e ignora linha corrompida", async (t) => {
+    const { mkdtempSync, rmSync, appendFileSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const { tmpdir } = await import("node:os");
+    const { Registro } = await import("../src/servidor/registro.ts");
+    const pasta = mkdtempSync(join(tmpdir(), "analista-reg-"));
+    t.after(() => rmSync(pasta, { recursive: true, force: true }));
+    const agora = () => Date.parse("2026-10-05T12:00:00Z");
+    const registro = new Registro(pasta, agora);
+    await registro.gravar({ pergunta: "a", modelo: "m1", tokensTotal: 100, latenciaMs: 1 });
+    await registro.gravar({ pergunta: "b", modelo: "m2", tokensTotal: 50, latenciaMs: 1 });
+    appendFileSync(join(pasta, "perguntas-2026-10-05.jsonl"), "{quebrada\n");
+    assert.equal(await registro.tokensDeHoje("m1"), 100);
+    assert.equal(await registro.tokensDeHoje(), 150);
+  });
+});

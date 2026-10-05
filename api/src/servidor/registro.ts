@@ -42,8 +42,11 @@ export class Registro {
     await appendFile(this.#arquivo(diaUTC(this.#agora())), `${JSON.stringify(completa)}\n`, "utf8");
   }
 
-  /** Tokens já gastos hoje (para o orçamento diário sobreviver a um reinício). */
-  async tokensDeHoje(): Promise<number> {
+  /**
+   * Tokens já gastos hoje com o modelo (para o orçamento diário sobreviver a um reinício).
+   * Por modelo porque a cota do provedor é por modelo.
+   */
+  async tokensDeHoje(modelo?: string): Promise<number> {
     let texto: string;
     try {
       texto = await readFile(this.#arquivo(diaUTC(this.#agora())), "utf8");
@@ -54,7 +57,9 @@ export class Registro {
     for (const linha of texto.split("\n")) {
       if (!linha.trim()) continue;
       try {
-        total += Number((JSON.parse(linha) as LinhaRegistro).tokensTotal ?? 0) || 0;
+        const registro = JSON.parse(linha) as LinhaRegistro;
+        if (modelo && registro.modelo !== modelo) continue;
+        total += Number(registro.tokensTotal ?? 0) || 0;
       } catch {
         // linha corrompida (ex.: queda no meio da escrita): ignorada
       }

@@ -15,6 +15,8 @@ const env = lerAmbiente();
 const porta = Number(env.PORTA ?? 3335);
 // Teto próprio de tokens por dia, abaixo dos 200 mil do provedor: sobra cota para a avaliação.
 const teto = Number(env.ORCAMENTO_DIARIO_TOKENS ?? 150_000);
+// Perguntas por minuto por IP (a avaliação, rodando na mesma máquina, usa um valor maior).
+const porMinuto = Number(env.LIMITE_POR_MINUTO ?? 6);
 
 const ia = carregarConfigIA(env);
 const pool = criarPool(carregarConfigBanco(env));
@@ -22,8 +24,8 @@ const registro = new Registro(fileURLToPath(new URL("../registros", import.meta.
 const app = criarApp({
   provedor: new ClienteGroq({ chave: ia.chave, modelo: ia.modelo, esforco: ia.esforco }),
   contexto: { pool, vocabulario: await carregarVocabulario(pool) },
-  limitePorIp: new LimitePorIp(6),
-  orcamento: new OrcamentoDiario(teto, await registro.tokensDeHoje()),
+  limitePorIp: new LimitePorIp(porMinuto),
+  orcamento: new OrcamentoDiario(teto, await registro.tokensDeHoje(ia.modelo)),
   registro,
   pastaWeb: fileURLToPath(new URL("../../web/dist", import.meta.url)),
 });

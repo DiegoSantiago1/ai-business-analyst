@@ -281,3 +281,17 @@ test("espera preventiva só pelo déficit (taxa = limite / 60 s), não até ench
   const [espera] = esperas;
   assert.ok(espera !== undefined && espera > 1000 && espera < 12_000, `esperou ${espera} ms`);
 });
+
+test("nome 'json' (gpt-oss-120b): a ferramenta é deduzida pelos campos", () => {
+  const nomes = ["consultar_metrica", "executar_sql", "responder"];
+  const gerado = (args: unknown) => JSON.stringify({ name: "json", arguments: args });
+  assert.equal(recuperarChamada(gerado({ resposta: "ok" }), nomes)?.function.name, "responder");
+  assert.equal(recuperarChamada(gerado({ sql: "SELECT 1" }), nomes)?.function.name, "executar_sql");
+  assert.equal(
+    recuperarChamada(gerado({ metricas: ["unidades"] }), nomes)?.function.name,
+    "consultar_metrica",
+  );
+  assert.equal(recuperarChamada(gerado({ outra: 1 }), nomes), undefined);
+  // Deduzida, mas fora do pedido: não recupera.
+  assert.equal(recuperarChamada(gerado({ sql: "x" }), ["responder"]), undefined);
+});
