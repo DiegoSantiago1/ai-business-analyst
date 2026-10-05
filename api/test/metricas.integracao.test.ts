@@ -78,7 +78,7 @@ describe("métricas no banco", () => {
     );
   });
 
-  test("participação soma 100% e o consórcio cresce em 2026 (padrão P4)", async () => {
+  test("participação com 2 agrupamentos é dentro do 1º: 100% por ano (padrão P4)", async () => {
     const linhas = await rodar({
       metricas: ["participacao_unidades_pct"],
       agrupar_por: ["ano", "forma_pagamento"],
@@ -87,10 +87,37 @@ describe("métricas no banco", () => {
     });
     for (const ano of [2025, 2026]) {
       const doAno = linhas.filter((l) => l.ano === ano);
+      const soma = doAno.reduce((s, l) => s + Number(l.participacao_unidades_pct), 0);
       assert.equal(doAno.length, 3);
+      assert.ok(Math.abs(soma - 100) < 0.5, `${ano}: soma ${soma}`);
     }
-    const total = linhas.reduce((s, l) => s + Number(l.participacao_unidades_pct), 0);
-    assert.ok(Math.abs(total - 100) < 0.5, `soma ${total}`);
+    const consorcio = (ano: number) =>
+      Number(
+        linhas.find((l) => l.ano === ano && l.forma_pagamento === "Consorcio")
+          ?.participacao_unidades_pct,
+      );
+    assert.ok(consorcio(2026) - consorcio(2025) >= 6, "o consórcio cresce em 2026");
+  });
+
+  test("% de SUV dentro de cada loja: Serra na frente (pergunta c06 da avaliação)", async () => {
+    const linhas = await rodar({
+      metricas: ["participacao_unidades_pct"],
+      agrupar_por: ["loja", "categoria"],
+      filtros: { categoria: ["SUV"] },
+      de: "2024-10-01",
+      ate: "2026-09-30",
+    });
+    // Com filtro de SUV, a fatia dentro de cada loja seria 100%: o filtro corta o resto.
+    assert.ok(linhas.every((l) => l.participacao_unidades_pct === 100));
+    const semFiltro = await rodar({
+      metricas: ["participacao_unidades_pct"],
+      agrupar_por: ["loja", "categoria"],
+      de: "2024-10-01",
+      ate: "2026-09-30",
+    });
+    const suv = semFiltro.filter((l) => l.categoria === "SUV");
+    suv.sort((a, b) => Number(b.participacao_unidades_pct) - Number(a.participacao_unidades_pct));
+    assert.equal(suv[0]?.loja, "Loja Serra");
   });
 
   test("filtro com nome aproximado e série mensal em ordem", async () => {

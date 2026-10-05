@@ -163,3 +163,34 @@ test("ordenar_por aceita a dimensão agrupada", () => {
     /metricas ou agrupar_por/,
   );
 });
+
+test("participação: OVER () com 1 agrupamento, PARTITION BY o 1º com 2", () => {
+  const um = montarConsulta(
+    { ...BASE, metricas: ["participacao_unidades_pct"], agrupar_por: ["loja"] },
+    VALORES,
+  );
+  assert.match(um.sql, /sum\(sum\(quantidade\)\) OVER \(\)/);
+  const dois = montarConsulta(
+    { ...BASE, metricas: ["participacao_unidades_pct"], agrupar_por: ["ano", "forma_pagamento"] },
+    VALORES,
+  );
+  assert.match(dois.sql, /OVER \(PARTITION BY ano\)/);
+});
+
+test("aviso para a armadilha da participação com filtro (c06)", () => {
+  const { aviso } = montarConsulta(
+    {
+      ...BASE,
+      metricas: ["participacao_unidades_pct"],
+      agrupar_por: ["loja"],
+      filtros: { categoria: ["SUV"] },
+    },
+    VALORES,
+  );
+  assert.match(aviso ?? "", /agrupar_por \[loja, categoria\] sem esse filtro/);
+  const semAviso = montarConsulta(
+    { ...BASE, metricas: ["participacao_unidades_pct"], agrupar_por: ["loja", "categoria"] },
+    VALORES,
+  );
+  assert.equal(semAviso.aviso, undefined);
+});

@@ -85,12 +85,13 @@ export const METRICAS = {
     },
   },
   participacao_unidades_pct: {
-    descricao: "Participação de cada grupo nas unidades do período, em %",
+    descricao:
+      "Fatia de cada grupo nas unidades, em %. Com 2 agrupamentos, a fatia é DENTRO do 1º (agrupar_por [loja, categoria] = % de cada categoria em cada loja)",
     unidade: "%",
     sql: { vendas: "round(100.0 * sum(quantidade) / sum(sum(quantidade)) OVER (), 1)" },
   },
   participacao_faturamento_pct: {
-    descricao: "Participação de cada grupo no faturamento do período, em %",
+    descricao: "Como participacao_unidades_pct, sobre o faturamento",
     unidade: "%",
     sql: { vendas: "round(100.0 * sum(valor_total) / sum(sum(valor_total)) OVER (), 1)" },
   },
@@ -181,6 +182,8 @@ export interface ConsultaMontada {
   sql: string;
   parametros: unknown[];
   fonte: Fonte;
+  /** Recado para a IA junto do resultado (ex.: uma leitura comum e errada da métrica). */
+  aviso?: string;
 }
 
 function formula(metrica: NomeMetrica, fonte: Fonte): string {
@@ -242,7 +245,14 @@ export function montarConsulta(entrada: unknown, valores: Valores): ConsultaMont
     onde.push(`${dimensao} = ANY(${parametro(casados)}::text[])`);
   }
 
-  const colunas = [...dimensoes, ...metricas.map((m) => `${formula(m, fonte)} AS ${m}`)];
+  // Participação com 2 agrupamentos: a fatia é dentro do 1º (ex.: % de cada forma de
+  // pagamento DENTRO de cada ano). Sobre o total geral, "consórcio em 2025 x 2026" sairia
+  // errado (medido na avaliação, 05/10/2026).
+  const janela = dimensoes.length === 2 ? `OVER (PARTITION BY ${dimensoes[0]})` : "OVER ()";
+  const colunas = [
+    ...dimensoes,
+    ...metricas.map((m) => `${formula(m, fonte).replace("OVER ()", janela)} AS ${m}`),
+  ];
   const temTempo = dimensoes.some((d) => d === "mes" || d === "ano");
   const ordem = p.ordem === "asc" ? "ASC" : "DESC";
   // Série no tempo sem ordenação pedida: ordem cronológica. Nos outros casos, pela
@@ -262,7 +272,18 @@ export function montarConsulta(entrada: unknown, valores: Valores): ConsultaMont
   ]
     .filter(Boolean)
     .join("\n");
-  return { sql, parametros, fonte };
+  // Armadilha medida na avaliação (c06, 05/10/2026): "% de SUV em cada loja" pedido como
+  // participação com filtro de categoria e agrupado só por loja. Isso mede a fatia de cada
+  // loja no total de SUVs, outra pergunta. O aviso volta junto do resultado.
+  const filtrosUsados = Object.keys(p.filtros);
+  const participacao = metricas.some((m) => m.startsWith("participacao_"));
+  const aviso =
+    participacao && dimensoes.length === 1 && filtrosUsados.some((f) => f !== dimensoes[0])
+      ? `participação aqui = fatia de cada ${dimensoes[0]} no total filtrado (${filtrosUsados.join(", ")}). ` +
+        `Para o % de cada ${filtrosUsados[0]} DENTRO de cada ${dimensoes[0]}, use agrupar_por ` +
+        `[${dimensoes[0]}, ${filtrosUsados[0]}] sem esse filtro.`
+      : undefined;
+  return { sql, parametros, fonte, ...(aviso ? { aviso } : {}) };
 }
 
 /** Texto do catálogo para o prompt de sistema (curto: ele vai em toda volta). */
