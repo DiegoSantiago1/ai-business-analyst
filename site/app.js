@@ -741,9 +741,40 @@ function renderPasso(p) {
   return el("li", { class: "passo" }, ...partes);
 }
 
+/**
+ * Markdown mínimo da resposta (parágrafos, tópicos "- " e **negrito**), igual ao da interface
+ * (web/src/texto.ts). O texto vem da IA e pode carregar dado hostil: nunca vira HTML, só
+ * elementos com texto (el() usa append de string = nó de texto).
+ */
+function textoRico(texto) {
+  const pedacos = (linha) => {
+    const partes = linha.split("**");
+    if (partes.length % 2 === 0) return [linha];
+    return partes.map((p, i) => (i % 2 === 1 ? el("strong", {}, p) : p)).filter((p) => p !== "");
+  };
+  const caixa = el("div", { class: "texto-rico" });
+  let lista = null;
+  for (const bruta of String(texto).split(/\r?\n/)) {
+    const linha = bruta.trim();
+    if (!linha) continue;
+    const topico = linha.match(/^(?:[-•*]|\d+[.)])\s+(.*)$/);
+    if (topico) {
+      if (!lista) {
+        lista = el("ul", {});
+        caixa.append(lista);
+      }
+      lista.append(el("li", {}, ...pedacos(topico[1])));
+    } else {
+      lista = null;
+      caixa.append(el("p", {}, ...pedacos(linha)));
+    }
+  }
+  return caixa;
+}
+
 function renderResposta(c) {
   const tp = t().player;
-  const partes = [el("p", {}, c.resposta)];
+  const partes = [textoRico(c.resposta)];
   if (c.numeros?.length) {
     partes.push(
       el(

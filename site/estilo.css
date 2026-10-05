@@ -1112,3 +1112,17 @@ pre {
     grid-template-columns: 1fr;
   }
 }
+
+.texto-rico p {
+  margin: 0 0 6px;
+  font-size: 15.5px;
+}
+
+.texto-rico ul {
+  margin: 0 0 8px;
+  padding-left: 20px;
+}
+
+.texto-rico li {
+  margin-bottom: 4px;
+}
