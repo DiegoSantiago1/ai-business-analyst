@@ -1,0 +1,7 @@
+# Dependências para rodar a parte Python (bootstrap, migrations, gerador, avaliação).
+alembic==1.20.0
+SQLAlchemy==2.1.3
+psycopg[binary]==3.3.6
+python-dotenv==1.2.4
+# O próprio projeto (pacote analista em src/), em modo editável.
+-e .
