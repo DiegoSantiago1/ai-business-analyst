@@ -6,14 +6,14 @@
 |---|---|
 | 0 Grill + medições | Feita (04/10/2026) |
 | 1 Fundação | Feita (04/10/2026): bootstrap, migration 0001, API Node/TS, CI verde |
-| 2 Dados fictícios | Próxima |
-| 3 Camada semântica (métricas) | Pendente |
-| 4 Núcleo de IA (ferramentas + travas) | Pendente |
-| 5 API HTTP | Pendente |
-| 6 Interface React | Pendente |
-| 7 Avaliação (Python) | Pendente |
-| 8 Página de resultados | Pendente |
-| 9 Fechamento | Pendente |
+| 2 Dados fictícios | Feita (04/10): 6.345 vendas, 9 padrões plantados, clientes hostis |
+| 3 Camada semântica (métricas) | Feita (04/10): 7 views, 9 métricas, SQL parametrizado |
+| 4 Núcleo de IA (ferramentas + travas) | Feita (05/10): loop, 4 camadas, prompt v4 |
+| 5 API HTTP | Feita (04/10): Express 5, fila, orçamento por modelo |
+| 6 Interface React | Feita (05/10): React 19 + Tailwind 4, gráfico SVG |
+| 7 Avaliação (Python) | Feita (05/10): 36 perguntas; oficial 28/32 (cota acabou), complementar 7/8 |
+| 8 Página de resultados | Feita (05/10): publicada no portfólio |
+| 9 Fechamento | Feita em parte (05/10): README EN/PT, revisões; falta o Diego validar, tornar o repositório público e pôr o card no portfólio |
 | 10 Versão ao vivo | Opcional, só se sobrar tempo |
 
 > Plano escrito em 04/10/2026, depois do grill. As decisões e o motivo de cada uma estão em [DECISOES.md](DECISOES.md). Números marcados com **(medido)** foram medidos; os marcados com **(estimativa)** ainda precisam ser medidos.
