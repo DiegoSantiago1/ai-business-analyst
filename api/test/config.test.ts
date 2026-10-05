@@ -5,7 +5,14 @@ import { join } from "node:path";
 import { describe, test } from "node:test";
 import { pathToFileURL } from "node:url";
 import { inspect } from "node:util";
-import { type Ambiente, ConfigError, carregarConfigBanco, lerAmbiente } from "../src/config.ts";
+import {
+  type Ambiente,
+  ConfigError,
+  carregarConfigBanco,
+  carregarConfigIA,
+  carregarConfigServidor,
+  lerAmbiente,
+} from "../src/config.ts";
 
 const ENV_VALIDO: Ambiente = {
   ANALISTA_DB_HOST: "127.0.0.1",
@@ -21,7 +28,6 @@ const OBRIGATORIAS = [
   "ANALISTA_DB_HOST",
   "ANALISTA_DB_PORT",
   "ANALISTA_DB_NAME",
-  "ANALISTA_DB_NAME_TESTE",
   "ANALISTA_IA_USER",
   "ANALISTA_IA_PASSWORD",
 ];
@@ -108,5 +114,59 @@ describe("lerAmbiente", () => {
   test("sem .env, usa só o ambiente do processo (como no CI)", () => {
     const env = lerAmbiente(pathToFileURL(join(tmpdir(), "nao-existe-analista", ".env")));
     assert.equal(env.PATH, process.env.PATH);
+  });
+});
+
+describe("produção (nuvem)", () => {
+  test("sem banco de testes vale; { teste: true } exige", () => {
+    const { ANALISTA_DB_NAME_TESTE: _fora, ...semTeste } = ENV_VALIDO;
+    assert.equal(carregarConfigBanco(semTeste).banco, "vendas_ia");
+    assert.throws(() => carregarConfigBanco(semTeste, { teste: true }), /ANALISTA_DB_NAME_TESTE/);
+  });
+
+  test("SSL desligado por padrão, ligado com ANALISTA_DB_SSL=true", () => {
+    assert.equal(carregarConfigBanco(ENV_VALIDO).ssl, false);
+    assert.equal(carregarConfigBanco({ ...ENV_VALIDO, ANALISTA_DB_SSL: "true" }).ssl, true);
+    assert.throws(
+      () => carregarConfigBanco({ ...ENV_VALIDO, ANALISTA_DB_SSL: "talvez" }),
+      /ANALISTA_DB_SSL/,
+    );
+  });
+
+  test("servidor: padrão local seguro; PORT da plataforma ganha de PORTA", () => {
+    const local = carregarConfigServidor({});
+    assert.deepEqual(local, {
+      host: "127.0.0.1",
+      porta: 3335,
+      confiarNoProxy: false,
+      orcamentoDiario: 150_000,
+      limitePorMinuto: 6,
+    });
+    const nuvem = carregarConfigServidor({
+      HOST: "0.0.0.0",
+      PORT: "10000",
+      PORTA: "3335",
+      TRUST_PROXY: "true",
+    });
+    assert.equal(nuvem.porta, 10000);
+    assert.equal(nuvem.confiarNoProxy, true);
+    assert.throws(() => carregarConfigServidor({ PORT: "abc" }), /PORT/);
+  });
+
+  test("modelo reserva: opcional, diferente do principal", () => {
+    const base = { GROQ_API_KEY: "gsk_x", GROQ_MODELO: "openai/gpt-oss-120b" };
+    assert.equal(carregarConfigIA(base).reserva, undefined);
+    assert.equal(
+      carregarConfigIA({ ...base, GROQ_MODELO_RESERVA: "openai/gpt-oss-20b" }).reserva,
+      "openai/gpt-oss-20b",
+    );
+    assert.throws(
+      () => carregarConfigIA({ ...base, GROQ_MODELO_RESERVA: "openai/gpt-oss-120b" }),
+      /diferente/,
+    );
+    assert.throws(
+      () => carregarConfigIA({ ...base, GROQ_MODELO_RESERVA: "llama" }),
+      /GROQ_MODELO_RESERVA/,
+    );
   });
 });

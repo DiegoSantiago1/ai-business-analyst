@@ -33,6 +33,8 @@ export function criarPool(config: ConfigBanco): pg.Pool {
     database: config.banco,
     user: config.usuario,
     password: config.senha,
+    // Banco gerenciado (Neon): TLS com verificação do certificado (CA pública).
+    ...(config.ssl ? { ssl: { rejectUnauthorized: true } } : {}),
     max: MAX_CONEXOES,
     // Banco fora do ar: falha em 5 s com erro claro, em vez de esperar o sistema.
     connectionTimeoutMillis: 5_000,

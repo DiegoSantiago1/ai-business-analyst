@@ -20,14 +20,16 @@ import {
   ErroProvedor,
   type ProvedorIA,
 } from "../ia/provedor.ts";
-import { Fila, FilaCheia, type LimitePorIp, type OrcamentoDiario } from "./limites.ts";
+import { Fila, FilaCheia, type LimitePorIp, type OrcamentoPorModelo } from "./limites.ts";
 import type { Registro } from "./registro.ts";
 
 export interface Dependencias {
   provedor: ProvedorIA;
   contexto: Contexto;
   limitePorIp: LimitePorIp;
-  orcamento: OrcamentoDiario;
+  orcamento: OrcamentoPorModelo;
+  /** Modelos que podem responder, em ordem de preferência (principal e reserva). */
+  modelos: string[];
   registro: Registro;
   fila?: Fila;
   pastaWeb?: string;
@@ -59,6 +61,9 @@ class ErroHttp extends Error {
     this.extra = extra;
   }
 }
+
+/** Média medida na avaliação (5.648, D23), arredondada para cima: estimativa honesta. */
+export const TOKENS_POR_PERGUNTA_ESTIMADO = 6_000;
 
 const MENSAGEM_COTA =
   "As perguntas de hoje acabaram (limite gratuito do provedor de IA). Volte amanhã ou veja as conversas gravadas.";
@@ -94,7 +99,21 @@ export function criarApp(d: Dependencias): express.Express {
       banco,
       modelo: d.provedor.modelo,
       dataReferencia: d.contexto.vocabulario.dataReferencia,
-      orcamento: { gastoHoje: d.orcamento.gasto, teto: d.orcamento.teto },
+      orcamento: d.modelos.map((modelo) => ({
+        modelo,
+        gastoHoje: d.orcamento.gasto(modelo),
+        teto: d.orcamento.teto,
+      })),
+      // Estimativa para a interface ("cerca de N perguntas restantes hoje").
+      perguntasRestantes: d.modelos.reduce(
+        (soma, m) =>
+          soma +
+          Math.max(
+            0,
+            Math.floor((d.orcamento.teto - d.orcamento.gasto(m)) / TOKENS_POR_PERGUNTA_ESTIMADO),
+          ),
+        0,
+      ),
     });
   });
 
@@ -114,7 +133,7 @@ export function criarApp(d: Dependencias): express.Express {
         },
       );
     }
-    if (d.orcamento.esgotado()) {
+    if (!d.modelos.some((m) => d.orcamento.disponivel(m))) {
       throw new ErroHttp(503, "cota_esgotada", MENSAGEM_COTA, {
         tentarEmSegundos: d.orcamento.segundosAteReiniciar(),
       });
@@ -124,7 +143,7 @@ export function criarApp(d: Dependencias): express.Express {
     const inicio = performance.now();
     try {
       const r = await fila.executar(() => perguntar(pergunta, d.provedor, d.contexto, historico));
-      d.orcamento.registrar(r.uso.tokensTotal);
+      d.orcamento.registrar(r.uso.modelo, r.uso.tokensTotal);
       await d.registro.gravar({
         pergunta,
         modelo: r.uso.modelo,
@@ -157,8 +176,8 @@ export function criarApp(d: Dependencias): express.Express {
         );
       }
       if (erro instanceof ErroCotaEsgotada) {
-        // A cota do provedor acabou antes do nosso teto: o nosso passa a valer esgotado.
-        d.orcamento.registrar(d.orcamento.teto);
+        // A cota do provedor acabou (de todos os modelos): o nosso orçamento também.
+        for (const m of d.modelos) d.orcamento.esgotar(m);
         throw new ErroHttp(503, "cota_esgotada", MENSAGEM_COTA, {
           tentarEmSegundos: erro.tentarDeNovoEmSegundos ?? d.orcamento.segundosAteReiniciar(),
         });

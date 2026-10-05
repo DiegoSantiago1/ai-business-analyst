@@ -11,7 +11,7 @@ import { after, before, describe, test } from "node:test";
 import type { Contexto } from "../src/ia/ferramentas.ts";
 import { ErroCotaEsgotada, type ProvedorIA } from "../src/ia/provedor.ts";
 import { criarApp } from "../src/servidor/app.ts";
-import { Fila, LimitePorIp, OrcamentoDiario } from "../src/servidor/limites.ts";
+import { Fila, LimitePorIp, OrcamentoPorModelo } from "../src/servidor/limites.ts";
 import { Registro } from "../src/servidor/registro.ts";
 import { carregarVocabulario } from "../src/vocabulario.ts";
 import { criarPoolDeTeste } from "./apoio.ts";
@@ -29,12 +29,13 @@ after(async () => {
 });
 
 async function subir(provedor: ProvedorIA, opcoes: { teto?: number; porMinuto?: number } = {}) {
-  const orcamento = new OrcamentoDiario(opcoes.teto ?? 100_000);
+  const orcamento = new OrcamentoPorModelo(opcoes.teto ?? 100_000);
   const app = criarApp({
     provedor,
     contexto,
     limitePorIp: new LimitePorIp(opcoes.porMinuto ?? 10),
     orcamento,
+    modelos: [provedor.modelo],
     registro: new Registro(pasta),
     fila: new Fila(3),
   });
@@ -74,7 +75,7 @@ describe("POST /api/perguntar", () => {
     assert.equal(corpo.resposta, "283 unidades.");
     assert.equal(corpo.numeros[0].conferido, true);
     assert.equal(corpo.tabela.sql.includes("FROM ia.vendas"), true);
-    assert.equal(api.orcamento.gasto, 2200);
+    assert.equal(api.orcamento.gasto("ia-falsa"), 2200);
     const registro = readFileSync(
       join(pasta, `perguntas-${new Date().toISOString().slice(0, 10)}.jsonl`),
       "utf8",
@@ -117,7 +118,7 @@ describe("POST /api/perguntar", () => {
   test("503 cota_esgotada quando o orçamento do dia acabou (sem chamar a IA)", async () => {
     const ia = new IAFalsa([]);
     const api = await subir(ia, { teto: 1 });
-    api.orcamento.registrar(5);
+    api.orcamento.registrar("ia-falsa", 5);
     const r = await api.post({ pergunta: "Quanto vendemos?" });
     assert.equal(r.status, 503);
     const corpo = await r.json();
@@ -139,7 +140,7 @@ describe("POST /api/perguntar", () => {
     assert.equal(r.status, 503);
     assert.equal((await r.json()).tentarEmSegundos, 3600);
     // Depois disso, a API nem tenta mais hoje.
-    assert.ok(api.orcamento.esgotado());
+    assert.equal(api.orcamento.disponivel("x"), false);
     await api.fechar();
   });
 
