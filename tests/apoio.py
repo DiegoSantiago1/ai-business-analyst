@@ -1,11 +1,15 @@
 """Funções de apoio usadas pelos testes e pelas fixtures."""
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 
 from analista.banco import Conexao
 
 
-def valor(con: Conexao, comando: str, parametros: Mapping[str, object] | None = None) -> object:
+def valor(
+    con: Conexao,
+    comando: str,
+    parametros: Mapping[str, object] | Sequence[object] | None = None,
+) -> object:
     """Primeira coluna da primeira linha de uma consulta."""
     resultado = con.execute(comando, parametros).fetchone()
     assert resultado is not None, f"consulta sem resultado: {comando}"

@@ -17,6 +17,7 @@ import sqlalchemy.exc
 from alembic import command
 
 from analista.banco import Conexao, conectar
+from analista.carga import carregar_banco
 from analista.config import ConfigBanco, ConfigError, carregar_config_banco
 from analista.migracoes import config_alembic
 
@@ -66,6 +67,16 @@ def banco_teste(config_banco: ConfigBanco) -> ConfigBanco:
         # O Alembic passa pelo SQLAlchemy, que embrulha o erro do psycopg no dele.
         falhar_sem_banco(erro)
     return config
+
+
+@pytest.fixture(scope="session")
+def banco_carregado(banco_teste: ConfigBanco) -> None:
+    """Banco de testes com os dados fictícios completos (a mesma carga do principal).
+
+    Fica carregado no fim da execução: os testes de integração da API (npm test) usam
+    esse banco em seguida, no CI e na máquina.
+    """
+    carregar_banco(banco_teste)
 
 
 @pytest.fixture
