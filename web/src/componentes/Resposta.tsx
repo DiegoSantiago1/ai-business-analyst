@@ -6,6 +6,7 @@ import {
   formatarValor,
   rotuloDaColuna,
 } from "../formatar.ts";
+import { blocos } from "../texto.ts";
 import type { Numero, Passo, Resultado, Tabela } from "../tipos.ts";
 import { Grafico } from "./Grafico.tsx";
 
@@ -19,7 +20,7 @@ export function Resposta({ r }: { r: Resultado }) {
   const [aba, setAba] = useState<"grafico" | "tabela">(r.grafico ? "grafico" : "tabela");
   return (
     <article className="rounded-2xl border border-linha bg-superficie p-4 sm:p-5">
-      <p className="m-0 text-[15px] leading-relaxed whitespace-pre-line">{r.resposta}</p>
+      <TextoRico texto={r.resposta} />
 
       {r.numeros.length > 0 && <Numeros numeros={r.numeros} />}
 
@@ -57,6 +58,43 @@ export function Resposta({ r }: { r: Resultado }) {
 
       <Bastidores passos={r.passos} uso={r.uso} />
     </article>
+  );
+}
+
+/** Parágrafos, tópicos e negrito da resposta; tudo como texto (o React escapa). */
+function TextoRico({ texto }: { texto: string }) {
+  return (
+    <div className="space-y-2 text-[15px] leading-relaxed">
+      {blocos(texto).map((bloco, i) =>
+        bloco.tipo === "lista" ? (
+          // biome-ignore lint/suspicious/noArrayIndexKey: blocos de um texto fixo, sem reordenação
+          <ul key={i} className="m-0 list-disc space-y-1 pl-5">
+            {bloco.itens.map((item, j) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: idem
+              <li key={j}>
+                <Pedacos pedacos={item} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          // biome-ignore lint/suspicious/noArrayIndexKey: idem
+          <p key={i} className="m-0">
+            <Pedacos pedacos={bloco.pedacos} />
+          </p>
+        ),
+      )}
+    </div>
+  );
+}
+
+function Pedacos({ pedacos }: { pedacos: { texto: string; negrito: boolean }[] }) {
+  return (
+    <>
+      {pedacos.map((p, i) =>
+        // biome-ignore lint/suspicious/noArrayIndexKey: idem
+        p.negrito ? <strong key={i}>{p.texto}</strong> : <span key={i}>{p.texto}</span>,
+      )}
+    </>
   );
 }
 

@@ -17,6 +17,7 @@ export class FalhaApi extends Error {
 export async function perguntarApi(
   pergunta: string,
   historico: Troca[],
+  detalhada = false,
   sinal?: AbortSignal,
 ): Promise<Resultado> {
   let resposta: Response;
@@ -24,7 +25,7 @@ export async function perguntarApi(
     resposta = await fetch("/api/perguntar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pergunta, historico: historico.slice(-3) }),
+      body: JSON.stringify({ pergunta, historico: historico.slice(-3), detalhada }),
       ...(sinal ? { signal: sinal } : {}),
     });
   } catch {

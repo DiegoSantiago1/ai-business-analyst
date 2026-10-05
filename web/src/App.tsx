@@ -39,6 +39,14 @@ export function App() {
   const fim = useRef<HTMLDivElement>(null);
   const proximoId = useRef(1);
   const [saude, setSaude] = useState<Saude | null>(null);
+  // Resposta detalhada (contexto + sugestão) ligada por padrão; a escolha fica no navegador.
+  const [detalhada, setDetalhada] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem("detalhada") !== "nao";
+    } catch {
+      return true;
+    }
+  });
   const [acordando, setAcordando] = useState(false);
 
   // Estado da demonstração: perguntas restantes hoje e, se a 1ª resposta demora, o aviso
@@ -88,7 +96,7 @@ export function App() {
     setTexto("");
     setCarregando(true);
     try {
-      const resultado = await perguntarApi(limpa, historico);
+      const resultado = await perguntarApi(limpa, historico, detalhada);
       setItens((atual) => atual.map((i) => (i.id === id ? { ...i, resultado } : i)));
       saudeApi()
         .then(setSaude)
@@ -187,7 +195,23 @@ export function App() {
             Perguntar
           </button>
         </div>
-        <p className="mt-2 mb-0 text-center text-xs text-tinta-3">
+        <label className="mt-2 flex cursor-pointer items-center justify-center gap-2 text-xs text-tinta-2 select-none">
+          <input
+            type="checkbox"
+            checked={detalhada}
+            onChange={(e) => {
+              setDetalhada(e.target.checked);
+              try {
+                localStorage.setItem("detalhada", e.target.checked ? "sim" : "nao");
+              } catch {
+                // sem armazenamento: vale só nesta visita
+              }
+            }}
+            className="accent-[var(--acento)]"
+          />
+          Resposta detalhada (com contexto e sugestão; usa mais da cota gratuita)
+        </label>
+        <p className="mt-1 mb-0 text-center text-xs text-tinta-3">
           A IA consulta o banco só para leitura e mostra o SQL de cada número. Dados 100% fictícios.
         </p>
       </form>
