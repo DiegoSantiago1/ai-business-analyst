@@ -119,3 +119,56 @@ export class Fila {
     });
   }
 }
+
+/**
+ * Orçamento do dia de cada modelo (a cota do provedor é por modelo). O gasto inicial de
+ * cada um vem do registro do dia, para sobreviver a um reinício do servidor.
+ */
+export class OrcamentoPorModelo {
+  readonly teto: number;
+  readonly #agora: () => number;
+  readonly #porModelo = new Map<string, OrcamentoDiario>();
+
+  constructor(
+    teto: number,
+    gastoInicial: Record<string, number> = {},
+    agora: () => number = Date.now,
+  ) {
+    this.teto = teto;
+    this.#agora = agora;
+    for (const [modelo, gasto] of Object.entries(gastoInicial)) {
+      this.#porModelo.set(modelo, new OrcamentoDiario(teto, gasto, agora));
+    }
+  }
+
+  #de(modelo: string): OrcamentoDiario {
+    let orcamento = this.#porModelo.get(modelo);
+    if (!orcamento) {
+      orcamento = new OrcamentoDiario(this.teto, 0, this.#agora);
+      this.#porModelo.set(modelo, orcamento);
+    }
+    return orcamento;
+  }
+
+  gasto(modelo: string): number {
+    return this.#de(modelo).gasto;
+  }
+
+  disponivel(modelo: string): boolean {
+    return !this.#de(modelo).esgotado();
+  }
+
+  registrar(modelo: string, tokens: number): void {
+    this.#de(modelo).registrar(tokens);
+  }
+
+  /** O provedor disse que a cota acabou: o modelo fica esgotado até a virada do dia. */
+  esgotar(modelo: string): void {
+    const orcamento = this.#de(modelo);
+    orcamento.registrar(Math.max(0, this.teto - orcamento.gasto));
+  }
+
+  segundosAteReiniciar(): number {
+    return new OrcamentoDiario(this.teto, 0, this.#agora).segundosAteReiniciar();
+  }
+}

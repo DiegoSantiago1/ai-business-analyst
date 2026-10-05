@@ -91,3 +91,20 @@ describe("Registro", () => {
     assert.equal(await registro.tokensDeHoje(), 150);
   });
 });
+
+describe("OrcamentoPorModelo", () => {
+  test("cada modelo tem o seu teto; esgotar vale até a virada do dia", async () => {
+    const { OrcamentoPorModelo } = await import("../src/servidor/limites.ts");
+    let agora = Date.parse("2026-10-05T23:00:00Z");
+    const o = new OrcamentoPorModelo(1_000, { a: 900 }, () => agora);
+    assert.equal(o.disponivel("a"), true);
+    o.registrar("a", 100);
+    assert.equal(o.disponivel("a"), false);
+    assert.equal(o.disponivel("b"), true);
+    o.esgotar("b");
+    assert.equal(o.disponivel("b"), false);
+    agora = Date.parse("2026-10-06T00:00:01Z");
+    assert.equal(o.disponivel("a"), true);
+    assert.equal(o.disponivel("b"), true);
+  });
+});
