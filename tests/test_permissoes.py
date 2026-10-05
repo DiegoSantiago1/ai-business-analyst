@@ -134,3 +134,31 @@ def test_ia_nao_entra_com_senha_errada(banco_teste: ConfigBanco) -> None:
             password="senha_errada",
             connect_timeout=5,
         ).close()
+
+
+VIEWS_DA_IA = [
+    "parametros", "lojas", "vendedores", "modelos", "metas", "vendas", "desempenho_lojas",
+]  # fmt: skip
+
+
+@pytest.mark.parametrize("view", VIEWS_DA_IA)
+def test_ia_le_cada_view_liberada(bd_ia: Conexao, banco_carregado: None, view: str) -> None:
+    assert valor(bd_ia, f"SELECT count(*) FROM ia.{view}") > 0  # type: ignore[operator]
+
+
+def test_lista_de_views_liberadas_e_exatamente_esta(bd: Conexao, banco_carregado: None) -> None:
+    # Allowlist: qualquer view nova sem GRANT, ou GRANT a mais, quebra este teste.
+    linhas = bd.execute(
+        "SELECT table_name FROM information_schema.role_table_grants "
+        "WHERE grantee = %s AND privilege_type = 'SELECT' ORDER BY 1",
+        (GRUPO_LEITURA,),
+    ).fetchall()
+    assert [t for (t,) in linhas] == sorted(VIEWS_DA_IA)
+
+
+@pytest.mark.parametrize("tabela", ["vendas", "lojas", "vendedores", "metas_mensais", "parametros"])
+def test_ia_nao_le_nenhuma_tabela_de_origem(
+    bd_ia: Conexao, banco_carregado: None, tabela: str
+) -> None:
+    with pytest.raises(errors.InsufficientPrivilege):
+        bd_ia.execute(f"SELECT * FROM vendas.{tabela}")
