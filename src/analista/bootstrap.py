@@ -1,7 +1,8 @@
 """Cria os usuários e os bancos do projeto no container PostgreSQL (executa db/bootstrap.sql).
 
-Uso (com o Docker Desktop aberto e o container compartilhado rodando):
-    python -m analista.bootstrap
+Uso (com o Docker Desktop aberto):
+    python -m analista.bootstrap            # container local (superusuário via docker exec)
+    python -m analista.bootstrap --remoto   # PostgreSQL gerenciado (Neon), ver docs/DEPLOY.md
 
 Por que docker exec: dentro do container o psql conecta ao superusuário pelo socket
 local, sem senha. Assim este projeto não precisa guardar a senha de superusuário. As
@@ -11,12 +12,15 @@ comando, para não aparecerem na lista de processos.
 
 from __future__ import annotations
 
+import argparse
 import os
 import re
 import shutil
 import subprocess
 import sys
 from collections.abc import Mapping
+from dataclasses import replace
+from urllib.parse import urlparse
 
 from dotenv import load_dotenv
 
@@ -29,6 +33,8 @@ from analista.config import (
 )
 
 ARQUIVO_SQL = RAIZ_PROJETO / "db" / "bootstrap.sql"
+# Só o cliente psql da imagem oficial, sem servidor: roda e some (--rm).
+IMAGEM_PSQL = "postgres:16-alpine"
 
 # Nomes de container aceitos pelo Docker.
 _NOME_CONTAINER = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*")
@@ -78,6 +84,31 @@ def comando_psql(docker: str, container: str, superusuario: str) -> list[str]:
     ]
 
 
+def comando_psql_remoto(docker: str) -> list[str]:
+    """psql dentro de um container descartável, conectando na URL de administrador.
+
+    A URL (com senha) vai pela variável PGURL do ambiente do processo (`-e PGURL` sem
+    valor copia do ambiente): ela não aparece nesta linha de comando nem na lista de
+    processos.
+    """
+    return [
+        docker, "run", "--rm", "-i", "-e", "PGURL", IMAGEM_PSQL,
+        "sh", "-c", 'exec psql "$PGURL" -X -v ON_ERROR_STOP=1',
+    ]  # fmt: skip
+
+
+def usuario_da_url(url: str) -> str:
+    """Usuário de uma URL postgresql://usuario:senha@host/banco (para conferir conflito)."""
+    partes = urlparse(url)
+    if (
+        partes.scheme not in ("postgres", "postgresql")
+        or not partes.username
+        or not partes.hostname
+    ):
+        raise ConfigError("ANALISTA_ADMIN_URL inválida: use postgresql://usuario:senha@host/banco.")
+    return partes.username
+
+
 def config_docker(env: Mapping[str, str]) -> tuple[str, str]:
     container = env.get("ANALISTA_DOCKER_CONTAINER", "").strip()
     if not _NOME_CONTAINER.fullmatch(container):
@@ -96,7 +127,7 @@ def conferir_usuarios(config: ConfigBanco, superusuario: str) -> None:
     ):
         if usuario == superusuario:
             raise ConfigError(
-                f"{variavel}={usuario!r} é o superusuário do container: o bootstrap tiraria "
+                f"{variavel}={usuario!r} é o administrador do servidor: o bootstrap tiraria "
                 "os privilégios dele. Use um usuário próprio do projeto."
             )
 
@@ -118,17 +149,45 @@ def _container_rodando(docker: str, container: str) -> bool:
     return resultado.returncode == 0 and resultado.stdout.strip() == "true"
 
 
-def main() -> int:
+def main(argumentos: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Cria os usuários e os bancos do projeto.")
+    parser.add_argument(
+        "--remoto",
+        action="store_true",
+        help="PostgreSQL gerenciado: conecta em ANALISTA_ADMIN_URL (sem docker exec)",
+    )
+    args = parser.parse_args(argumentos)
     load_dotenv(RAIZ_PROJETO / ".env", override=False)
     try:
         banco = carregar_config_banco()
-        container, superusuario = config_docker(os.environ)
-        conferir_usuarios(banco, superusuario)
+        if args.remoto:
+            # Na nuvem não há banco de testes (mesmo que o .env local defina um).
+            banco = replace(banco, nome_teste="")
         docker = _docker()
         entrada = montar_entrada_psql(banco, ARQUIVO_SQL.read_text(encoding="utf-8"))
+        if args.remoto:
+            url = os.environ.get("ANALISTA_ADMIN_URL", "").strip()
+            conferir_usuarios(banco, usuario_da_url(url))
+        else:
+            container, superusuario = config_docker(os.environ)
+            conferir_usuarios(banco, superusuario)
     except ConfigError as erro:
         print(f"Erro de configuração: {erro}", file=sys.stderr)
         return 2
+
+    if args.remoto:
+        print(f"Bootstrap remoto: usuários {banco.usuario!r} e {banco.usuario_ia!r}...", flush=True)
+        resultado = subprocess.run(  # noqa: S603 (argumentos fixos, sem shell local)
+            comando_psql_remoto(docker),
+            input=entrada.encode("utf-8"),
+            env={**os.environ, "PGURL": url},
+            check=False,
+        )
+        if resultado.returncode != 0:
+            print("Falhou: veja a mensagem do psql acima.", file=sys.stderr)
+            return resultado.returncode
+        print("Pronto.")
+        return 0
 
     if not _container_rodando(docker, container):
         print(

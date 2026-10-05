@@ -43,15 +43,20 @@ class ConfigBanco:
     nome: str
     usuario: str
     # Banco usado pelos testes automatizados; é apagado e recriado a cada execução.
+    # Vazio na nuvem (lá não há banco de testes).
     nome_teste: str
     # Usuário somente leitura da IA (membro do grupo analista_leitura).
     usuario_ia: str
     # repr=False: as senhas não aparecem se o objeto for impresso num log ou traceback.
     senha: str = field(repr=False)
     senha_ia: str = field(repr=False)
+    # TLS obrigatório até o banco (PostgreSQL gerenciado, como o Neon).
+    ssl: bool = False
 
     def do_banco_de_teste(self) -> ConfigBanco:
         """Mesma configuração, apontando para o banco de testes."""
+        if not self.nome_teste:
+            raise ConfigError("ANALISTA_DB_NAME_TESTE não definido: não há banco de testes.")
         return replace(self, nome=self.nome_teste)
 
     def como_ia(self) -> ConfigBanco:
@@ -67,6 +72,7 @@ class ConfigBanco:
             host=self.host,
             port=self.porta,
             database=self.nome,
+            query={"sslmode": "require"} if self.ssl else {},
         )
 
 
@@ -84,6 +90,15 @@ def validar_identificador(valor: str, nome_variavel: str) -> str:
             "começando por letra ou '_' (máx. 63 caracteres)."
         )
     return valor
+
+
+def _booleano(texto: str, nome: str) -> bool:
+    valor = texto.strip().lower()
+    if valor in ("", "0", "false", "nao", "não", "off"):
+        return False
+    if valor in ("1", "true", "sim", "on"):
+        return True
+    raise ConfigError(f"{nome}={texto!r} inválido: use true ou false.")
 
 
 def _porta(texto: str) -> int:
@@ -107,9 +122,9 @@ def carregar_config_banco(env: Mapping[str, str] | None = None) -> ConfigBanco:
         env = os.environ
 
     nome = validar_identificador(_obrigatoria(env, "ANALISTA_DB_NAME"), "ANALISTA_DB_NAME")
-    nome_teste = validar_identificador(
-        _obrigatoria(env, "ANALISTA_DB_NAME_TESTE"), "ANALISTA_DB_NAME_TESTE"
-    )
+    # Opcional: na nuvem não há banco de testes.
+    texto_teste = env.get("ANALISTA_DB_NAME_TESTE", "").strip()
+    nome_teste = validar_identificador(texto_teste, "ANALISTA_DB_NAME_TESTE") if texto_teste else ""
     # Trava de segurança: os testes APAGAM e recriam o banco de testes. Se ele tivesse
     # o mesmo nome do banco principal, rodar os testes destruiria os dados do projeto.
     if nome_teste == nome:
@@ -137,4 +152,5 @@ def carregar_config_banco(env: Mapping[str, str] | None = None) -> ConfigBanco:
         nome_teste=nome_teste,
         usuario_ia=usuario_ia,
         senha_ia=_obrigatoria(env, "ANALISTA_IA_PASSWORD"),
+        ssl=_booleano(env.get("ANALISTA_DB_SSL", ""), "ANALISTA_DB_SSL"),
     )

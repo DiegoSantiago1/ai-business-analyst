@@ -142,6 +142,7 @@ def montar(
     rodada: dict[str, Any],
     comparacao: dict[str, Any] | None = None,
     complementares: list[dict[str, Any]] | None = None,
+    url_ao_vivo: str | None = None,
 ) -> dict[str, Any]:
     complementares = complementares or []
     por_id = {i["id"]: i for i in rodada["itens"] if i["status"] == 200}
@@ -182,6 +183,8 @@ def montar(
         "custos": custos(rodada),
         "limites_gratuitos": LIMITES_GRATUITOS,
         "comparacao": None,
+        # Endereço da versão ao vivo (botão "Experimente ao vivo"); None esconde o botão.
+        "url_ao_vivo": url_ao_vivo,
         "complementares": [
             {
                 "modelo": extra["modelo"],
@@ -211,6 +214,7 @@ def main(argumentos: list[str] | None = None) -> int:
     parser.add_argument("rodada", type=Path)
     parser.add_argument("--comparar", type=Path)
     parser.add_argument("--complementar", type=Path, action="append", default=[])
+    parser.add_argument("--url-ao-vivo", help="endereço https da versão ao vivo (docs/DEPLOY.md)")
     args = parser.parse_args(argumentos)
     rodada = json.loads(args.rodada.read_text(encoding="utf-8"))
     if "resumo" not in rodada:
@@ -218,7 +222,10 @@ def main(argumentos: list[str] | None = None) -> int:
         return 1
     comparacao = json.loads(args.comparar.read_text(encoding="utf-8")) if args.comparar else None
     complementares = [json.loads(c.read_text(encoding="utf-8")) for c in args.complementar]
-    pagina = montar(rodada, comparacao, complementares)
+    if args.url_ao_vivo and not args.url_ao_vivo.startswith("https://"):
+        print("--url-ao-vivo precisa começar com https://", file=sys.stderr)
+        return 1
+    pagina = montar(rodada, comparacao, complementares, args.url_ao_vivo)
     DESTINO.parent.mkdir(parents=True, exist_ok=True)
     DESTINO.write_text(
         json.dumps(pagina, ensure_ascii=False, separators=(",", ":"), default=str),

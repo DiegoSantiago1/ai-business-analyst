@@ -6,7 +6,9 @@
 --   :banco_teste            banco dos testes (apagado e recriado pelo pytest)
 --   :ia_usuario, :ia_senha  usuário SOMENTE LEITURA da IA (o que a API usa)
 --
--- Roda como superusuário, uma vez (e pode rodar de novo sem quebrar nada).
+-- Roda como superusuário (container local) ou como o administrador de um PostgreSQL
+-- gerenciado (Neon: CREATEROLE + CREATEDB, sem ser superusuário), uma vez (e pode rodar
+-- de novo sem quebrar nada). :banco_teste pode ser vazio (na nuvem não há banco de testes).
 -- Não use diretamente: o `python -m analista.bootstrap` lê o .env, valida os
 -- valores e envia este arquivo ao psql com as variáveis já definidas.
 --
@@ -46,33 +48,44 @@ WHERE NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = :'usuario')
 
 -- Sempre reaplica atributos e senha: se o role já existia, fica em sincronia com o
 -- .env e sem privilégios extras.
+-- SUPERUSER, REPLICATION e BYPASSRLS só um superusuário altera. Um administrador comum
+-- (PostgreSQL gerenciado) não consegue criar roles com eles, então eles nem existem lá.
 SELECT format(
-    'ALTER ROLE %I LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS PASSWORD %L',
-    :'usuario', :'senha'
+    'ALTER ROLE %I LOGIN NOCREATEDB NOCREATEROLE %s PASSWORD %L',
+    :'usuario',
+    CASE WHEN (SELECT rolsuper FROM pg_roles WHERE rolname = current_user)
+         THEN 'NOSUPERUSER NOREPLICATION NOBYPASSRLS' ELSE '' END,
+    :'senha'
 )
+\gexec
+
+-- Administrador que não é superusuário: precisa poder "virar" o dono para criar o banco
+-- em nome dele (CREATE DATABASE ... OWNER).
+SELECT format('GRANT %I TO %I WITH SET TRUE, INHERIT TRUE', :'usuario', current_user)
+WHERE NOT (SELECT rolsuper FROM pg_roles WHERE rolname = current_user)
 \gexec
 
 -- 2. Bancos do projeto (principal e de testes), pertencentes ao dono.
 SELECT format('CREATE DATABASE %I OWNER %I ENCODING %L TEMPLATE template0', b.nome, :'usuario', 'UTF8')
-FROM unnest(ARRAY[:'banco', :'banco_teste']) AS b(nome)
+FROM (SELECT DISTINCT x FROM unnest(ARRAY[:'banco', :'banco_teste']) AS x WHERE x <> '') AS b(nome)
 WHERE NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = b.nome)
 \gexec
 
 SELECT format('ALTER DATABASE %I OWNER TO %I', b.nome, :'usuario')
-FROM unnest(ARRAY[:'banco', :'banco_teste']) AS b(nome)
+FROM (SELECT DISTINCT x FROM unnest(ARRAY[:'banco', :'banco_teste']) AS x WHERE x <> '') AS b(nome)
 \gexec
 
 -- 3. Fuso horário na origem (lição do Projeto 1): as lojas ficam em Recife. Toda
 --    sessão nestes bancos enxerga datas e horas em America/Recife.
 SELECT format('ALTER DATABASE %I SET timezone TO %L', b.nome, 'America/Recife')
-FROM unnest(ARRAY[:'banco', :'banco_teste']) AS b(nome)
+FROM (SELECT DISTINCT x FROM unnest(ARRAY[:'banco', :'banco_teste']) AS x WHERE x <> '') AS b(nome)
 \gexec
 
 -- 4. Por padrão o PostgreSQL deixa QUALQUER role conectar em qualquer banco e criar
 --    tabelas temporárias nele (privilégios CONNECT e TEMP do PUBLIC). Aqui só o dono
 --    conecta e, pelo passo 5, o grupo de leitura da IA (sem TEMP).
 SELECT format('REVOKE ALL ON DATABASE %I FROM PUBLIC', b.nome)
-FROM unnest(ARRAY[:'banco', :'banco_teste']) AS b(nome)
+FROM (SELECT DISTINCT x FROM unnest(ARRAY[:'banco', :'banco_teste']) AS x WHERE x <> '') AS b(nome)
 \gexec
 
 -- 5. Usuário da IA (menor privilégio). O grupo analista_leitura (sem login) recebe as
@@ -89,9 +102,11 @@ WHERE NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = :'ia_usuario')
 -- CONNECTION LIMIT: mesmo com um bug no pool da API, a IA nunca ocupa mais que 5
 -- conexões do servidor compartilhado.
 SELECT format(
-    'ALTER ROLE %I LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS '
-    'CONNECTION LIMIT 5 PASSWORD %L',
-    :'ia_usuario', :'ia_senha'
+    'ALTER ROLE %I LOGIN NOCREATEDB NOCREATEROLE %s CONNECTION LIMIT 5 PASSWORD %L',
+    :'ia_usuario',
+    CASE WHEN (SELECT rolsuper FROM pg_roles WHERE rolname = current_user)
+         THEN 'NOSUPERUSER NOREPLICATION NOBYPASSRLS' ELSE '' END,
+    :'ia_senha'
 )
 \gexec
 
@@ -117,5 +132,5 @@ SELECT format('GRANT analista_leitura TO %I', :'ia_usuario')
 \gexec
 
 SELECT format('GRANT CONNECT ON DATABASE %I TO analista_leitura', b.nome)
-FROM unnest(ARRAY[:'banco', :'banco_teste']) AS b(nome)
+FROM (SELECT DISTINCT x FROM unnest(ARRAY[:'banco', :'banco_teste']) AS x WHERE x <> '') AS b(nome)
 \gexec

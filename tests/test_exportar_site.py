@@ -114,3 +114,9 @@ def test_conversa_que_faltou_vem_da_complementar() -> None:
     assert pagina["conversas"][0]["ok"] is True
     assert pagina["complementares"][0]["versao_prompt"] == "v3"
     assert len(pagina["complementares"][0]["itens"]) == 2
+
+
+def test_url_ao_vivo_opcional() -> None:
+    assert montar(rodada([item("a")]))["url_ao_vivo"] is None
+    pagina = montar(rodada([item("a")]), url_ao_vivo="https://exemplo.onrender.com")
+    assert pagina["url_ao_vivo"] == "https://exemplo.onrender.com"

@@ -19,4 +19,7 @@ def conectar(config: ConfigBanco) -> Conexao:
         user=config.usuario,
         password=config.senha,
         connect_timeout=5,
+        # Banco gerenciado (Neon): conexão cifrada obrigatória. No local, "prefer" (o padrão
+        # do libpq) usa TLS só se o servidor oferecer.
+        sslmode="require" if config.ssl else "prefer",
     )

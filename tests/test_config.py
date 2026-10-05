@@ -40,14 +40,17 @@ def test_senha_com_caracteres_especiais_vai_escapada_na_url() -> None:
     assert "a@b:c/d" not in config.url().render_as_string(hide_password=False)
 
 
-@pytest.mark.parametrize("variavel", sorted(ENV_VALIDO))
+OBRIGATORIAS = sorted(set(ENV_VALIDO) - {"ANALISTA_DB_NAME_TESTE"})
+
+
+@pytest.mark.parametrize("variavel", OBRIGATORIAS)
 def test_variavel_ausente(variavel: str) -> None:
     env = {k: v for k, v in ENV_VALIDO.items() if k != variavel}
     with pytest.raises(ConfigError, match=variavel):
         carregar_config_banco(env)
 
 
-@pytest.mark.parametrize("variavel", sorted(ENV_VALIDO))
+@pytest.mark.parametrize("variavel", OBRIGATORIAS)
 def test_variavel_em_branco(variavel: str) -> None:
     with pytest.raises(ConfigError, match=variavel):
         carregar_config_banco({**ENV_VALIDO, variavel: "   "})
@@ -78,3 +81,24 @@ def test_usuario_da_ia_precisa_ser_proprio(usuario_ia: str) -> None:
     # Se a IA usasse o dono, toda a defesa no banco deixaria de existir.
     with pytest.raises(ConfigError, match="ANALISTA_IA_USER"):
         carregar_config_banco({**ENV_VALIDO, "ANALISTA_IA_USER": usuario_ia})
+
+
+def test_sem_banco_de_testes_vale_na_nuvem_mas_nao_para_os_testes() -> None:
+    env = {k: v for k, v in ENV_VALIDO.items() if k != "ANALISTA_DB_NAME_TESTE"}
+    config = carregar_config_banco(env)
+    with pytest.raises(ConfigError, match="banco de testes"):
+        config.do_banco_de_teste()
+
+
+@pytest.mark.parametrize(
+    ("texto", "esperado"), [("", False), ("false", False), ("true", True), ("1", True)]
+)
+def test_ssl(texto: str, esperado: bool) -> None:
+    config = carregar_config_banco({**ENV_VALIDO, "ANALISTA_DB_SSL": texto})
+    assert config.ssl is esperado
+    assert ("sslmode=require" in config.url().render_as_string()) is esperado
+
+
+def test_ssl_invalido() -> None:
+    with pytest.raises(ConfigError, match="ANALISTA_DB_SSL"):
+        carregar_config_banco({**ENV_VALIDO, "ANALISTA_DB_SSL": "talvez"})

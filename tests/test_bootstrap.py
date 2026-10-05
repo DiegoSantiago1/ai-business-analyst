@@ -5,9 +5,11 @@ import pytest
 from analista.bootstrap import (
     citar_valor_psql,
     comando_psql,
+    comando_psql_remoto,
     conferir_usuarios,
     config_docker,
     montar_entrada_psql,
+    usuario_da_url,
 )
 from analista.config import ConfigError, carregar_config_banco
 
@@ -70,3 +72,26 @@ def test_nenhum_usuario_do_projeto_pode_ser_o_superusuario(variavel: str) -> Non
 
 def test_usuarios_proprios_passam() -> None:
     conferir_usuarios(carregar_config_banco(ENV_VALIDO), "honda")
+
+
+def test_comando_remoto_nao_leva_a_url_nem_a_senha() -> None:
+    comando = comando_psql_remoto("docker")
+    assert "-e" in comando and "PGURL" in comando
+    assert not any("postgresql://" in parte or "senha" in parte for parte in comando)
+
+
+@pytest.mark.parametrize(
+    ("url", "usuario"),
+    [
+        ("postgresql://neondb_owner:abc@ep-x.neon.tech/neondb?sslmode=require", "neondb_owner"),
+        ("postgres://admin:x@host.docker.internal:55432/postgres", "admin"),
+    ],
+)
+def test_usuario_da_url(url: str, usuario: str) -> None:
+    assert usuario_da_url(url) == usuario
+
+
+@pytest.mark.parametrize("url", ["", "mysql://a:b@h/x", "postgresql://h/x", "não é url"])
+def test_url_invalida(url: str) -> None:
+    with pytest.raises(ConfigError, match="ANALISTA_ADMIN_URL"):
+        usuario_da_url(url)
