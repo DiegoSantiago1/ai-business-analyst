@@ -556,6 +556,14 @@ function renderHero() {
   const aoVivo = document.getElementById("ao-vivo");
   aoVivo.hidden = !dados.url_ao_vivo;
   if (dados.url_ao_vivo) aoVivo.href = dados.url_ao_vivo;
+  // Código: só com o repositório público (um link 404 para recrutador é pior que nenhum).
+  const codigo = document.getElementById("codigo");
+  const rodape = document.getElementById("codigo-rodape");
+  codigo.hidden = rodape.hidden = !dados.url_codigo;
+  if (dados.url_codigo) {
+    codigo.href = dados.url_codigo;
+    rodape.querySelector("a").href = dados.url_codigo;
+  }
   const r = dados.avaliacao.resumo;
   const hostis = hostisDeTodas();
   const k = t().kpi;

@@ -120,3 +120,9 @@ def test_url_ao_vivo_opcional() -> None:
     assert montar(rodada([item("a")]))["url_ao_vivo"] is None
     pagina = montar(rodada([item("a")]), url_ao_vivo="https://exemplo.onrender.com")
     assert pagina["url_ao_vivo"] == "https://exemplo.onrender.com"
+
+
+def test_url_codigo_opcional() -> None:
+    assert montar(rodada([item("a")]))["url_codigo"] is None
+    pagina = montar(rodada([item("a")]), url_codigo="https://github.com/x/y")
+    assert pagina["url_codigo"] == "https://github.com/x/y"

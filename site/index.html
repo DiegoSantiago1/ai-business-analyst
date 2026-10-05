@@ -61,9 +61,9 @@
           </p>
           <div class="kpis" id="kpis" aria-live="polite"></div>
           <div class="hero-acoes">
-            <a class="botao-principal" id="ao-vivo" href="#" hidden data-i18n="hero.aoVivo">Experimente ao vivo</a>
+            <a class="botao-principal" id="ao-vivo" href="#" hidden target="_blank" rel="noopener noreferrer" data-i18n="hero.aoVivo">Experimente ao vivo</a>
             <a class="botao-principal" href="#conversas" data-i18n="hero.ver">Ver uma conversa real</a>
-            <a class="botao-secundario" href="https://github.com/DiegoSantiago1/ai-business-analyst" data-i18n="hero.codigo"
+            <a class="botao-secundario" id="codigo" hidden href="#" data-i18n="hero.codigo"
               >Código no GitHub</a
             >
           </div>
@@ -297,7 +297,7 @@
         </p>
         <p>
           <a href="https://diegosantiago1.github.io/Portifolio/" data-i18n="rod.portfolio">Portfólio</a> ·
-          <a href="https://github.com/DiegoSantiago1/ai-business-analyst">GitHub</a> ·
+          <span id="codigo-rodape" hidden><a href="#">GitHub</a> ·</span>
           <a href="https://www.linkedin.com/in/diego-freitas-santiago">LinkedIn</a>
         </p>
         <p class="nota" data-i18n="rod.dados">

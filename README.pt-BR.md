@@ -7,9 +7,11 @@ Um analista de dados com IA para uma rede de concessionárias: o gerente pergunt
 ## 🔗 Acessar o projeto
 
 [![Abrir o projeto](https://img.shields.io/badge/%E2%96%B6%20Abrir%20o%20projeto-EA580C?style=for-the-badge)](https://diegosantiago1.github.io/Portifolio/projetos/ai-business-analyst/)
+[![Pergunte à IA ao vivo](https://img.shields.io/badge/%F0%9F%92%AC%20Pergunte%20%C3%A0%20IA%20ao%20vivo-C5F03A?style=for-the-badge)](https://ai-business-analyst-f85s.onrender.com)
 [![Ver no portfólio](https://img.shields.io/badge/Ver%20no%20portf%C3%B3lio-1F2937?style=for-the-badge&logo=googlechrome&logoColor=white)](https://diegosantiago1.github.io/Portifolio/#projetos)
 
 **Link direto:** https://diegosantiago1.github.io/Portifolio/projetos/ai-business-analyst/ — abre a página de resultados: conversas reais gravadas passo a passo, a avaliação e os testes de segurança.
+**Chat ao vivo:** https://ai-business-analyst-f85s.onrender.com — faça a sua própria pergunta. No plano gratuito, a primeira resposta depois de um tempo sem uso pode levar até 1 minuto (o servidor acorda).
 
 ![Página de resultados](docs/imagens/pagina.png)
 
@@ -53,7 +55,7 @@ As 4 perguntas restantes e as 4 que falharam rodaram de novo no `gpt-oss-20b` co
 
 ## Versão ao vivo e respostas detalhadas
 
-- **Pronta para publicar** em planos gratuitos: API + interface numa imagem Docker (Render) e o banco no Neon, com passo a passo em [docs/DEPLOY.md](docs/DEPLOY.md). O bootstrap remoto foi ensaiado num PostgreSQL em que o administrador **não** é superusuário (como no Neon), com todos os testes Python e da API passando lá; o CI constrói a imagem a cada push.
+- **No ar em planos gratuitos** (https://ai-business-analyst-f85s.onrender.com): API + interface numa imagem Docker (Render) e o banco no Neon, com passo a passo em [docs/DEPLOY.md](docs/DEPLOY.md). O bootstrap remoto foi ensaiado num PostgreSQL em que o administrador **não** é superusuário (como no Neon), com todos os testes Python e da API passando lá; o CI constrói a imagem a cada push.
 - **Proteções do plano gratuito:** 4 perguntas por minuto por visitante, uma pergunta por vez, orçamento diário por modelo, **modelo reserva** (quando o `gpt-oss-120b` esgota, o `gpt-oss-20b` responde, dobrando as perguntas por dia) e o aviso "acordando o servidor" quando a hospedagem estava dormindo.
 - **Respostas detalhadas** (padrão na interface, opcional na API): a resposta direta em negrito, 2 a 4 tópicos de contexto e uma sugestão de próxima pergunta. Medidas antes de adotar: a primeira versão acertou 3 de 8 no `gpt-oss-20b` (o modelo devolvia só a linha em negrito); a corrigida (v5.1) acertou 8 de 8 nas mesmas perguntas e 6 de 6 em perguntas que não foram usadas no ajuste, com ~30% mais tokens. Detalhes em [DECISOES.md](docs/DECISOES.md) (D27).
 

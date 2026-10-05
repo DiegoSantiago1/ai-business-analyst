@@ -7,9 +7,11 @@ An AI data analyst for a car dealership network: the manager asks in Portuguese,
 ## 🔗 Access the project
 
 [![Open the project](https://img.shields.io/badge/%E2%96%B6%20Open%20the%20project-EA580C?style=for-the-badge)](https://diegosantiago1.github.io/Portifolio/projetos/ai-business-analyst/)
+[![Ask the AI live](https://img.shields.io/badge/%F0%9F%92%AC%20Ask%20the%20AI%20live-C5F03A?style=for-the-badge)](https://ai-business-analyst-f85s.onrender.com)
 [![See it in my portfolio](https://img.shields.io/badge/See%20it%20in%20my%20portfolio-1F2937?style=for-the-badge&logo=googlechrome&logoColor=white)](https://diegosantiago1.github.io/Portifolio/#projetos)
 
 **Direct link:** https://diegosantiago1.github.io/Portifolio/projetos/ai-business-analyst/ — opens the results page: real recorded conversations step by step, the evaluation and the security tests.
+**Live chat:** https://ai-business-analyst-f85s.onrender.com — ask your own question (Portuguese works best). Free tier: the first answer after a quiet period can take up to a minute while the server wakes up.
 
 ![Results page](docs/imagens/pagina.png)
 
@@ -53,7 +55,7 @@ The remaining 4 questions, and the 4 that failed, ran again on `gpt-oss-20b` wit
 
 ## Live version and detailed answers
 
-- **Ready to deploy** on free tiers: API + UI in one Docker image (Render) and the database on Neon, with a step-by-step guide in [docs/DEPLOY.md](docs/DEPLOY.md). The remote bootstrap was rehearsed on a PostgreSQL where the admin is **not** a superuser (like Neon), with all Python and API tests passing there; CI builds the image on every push.
+- **Live on free tiers** (https://ai-business-analyst-f85s.onrender.com): API + UI in one Docker image (Render) and the database on Neon, with a step-by-step guide in [docs/DEPLOY.md](docs/DEPLOY.md). The remote bootstrap was rehearsed on a PostgreSQL where the admin is **not** a superuser (like Neon), with all Python and API tests passing there; CI builds the image on every push.
 - **Free-tier protections:** 4 questions per minute per visitor, one question at a time, a daily budget per model, a **fallback model** (when `gpt-oss-120b` runs out, `gpt-oss-20b` answers, doubling the daily questions) and a "waking up the server" notice for cold starts.
 - **Detailed answers** (default in the UI, optional in the API): the direct answer in bold, 2–4 context bullets and a suggested next question. Measured before adopting: the first version scored 3/8 on `gpt-oss-20b` (the model returned only the bold line); the fixed one (v5.1) scored 8/8 on the same questions and 6/6 on questions not used for tuning, at ~30% more tokens. Details in [DECISOES.md](docs/DECISOES.md) (D27).
 
