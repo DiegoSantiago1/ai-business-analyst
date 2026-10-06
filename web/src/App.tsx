@@ -4,11 +4,11 @@ import { Resposta } from "./componentes/Resposta.tsx";
 import type { ErroApi, Resultado } from "./tipos.ts";
 
 const SUGESTOES = [
-  "Quais lojas estão abaixo da meta este mês?",
+  "Quais lojas ficaram abaixo da meta em setembro de 2026?",
   "Qual linha de carro mais vendeu em 2026?",
   "Como evoluiu o faturamento mês a mês nos últimos 12 meses?",
   "O consórcio ganhou participação em 2026?",
-  "Quem são os 5 melhores vendedores este ano, em unidades?",
+  "Quem são os 5 melhores vendedores de 2026, em unidades?",
   "Qual loja tem o maior ticket médio?",
 ];
 

@@ -240,14 +240,14 @@ const ATAQUES = [
 
 const LIMITACOES = {
   pt: [
-    "Plano gratuito do Groq: ~1 pergunta por minuto e ~40 por dia por modelo. Por isso a demonstração é por conversas gravadas; uma versão ao vivo precisaria de plano pago ou de fila.",
+    "Plano gratuito do Groq: ~1 pergunta por minuto e ~40 por dia por modelo. Por isso o chat ao vivo responde uma pergunta por vez, limita cada visitante e, quando o modelo principal esgota, passa para um modelo reserva. Se a cota do dia acabar, ele avisa e aponta para estas conversas gravadas.",
     "O modelo às vezes copia um número errado (ex.: escreveu 96,2% quando o banco dizia 96,3%). A conferência automática marca esses casos como “calculado pela IA”, para o gerente não confiar de olhos fechados.",
     "O gpt-oss no Groq gera chamadas malformadas de vez em quando (marcador interno no nome da ferramenta, “json” ou “response” no lugar de “responder”). A API recupera esses casos e valida os argumentos de novo; tudo está registrado nos testes.",
     "36 perguntas mostram regressão e comportamento, não uma estatística robusta. A conferência automática usa números e palavras-chave e pode errar nos dois sentidos: as respostas completas estão na tabela acima.",
     "Dados fictícios (6,3 mil vendas em 24 meses): servem para plantar padrões conhecidos, não para tirar conclusões de negócio.",
   ],
   en: [
-    "Groq free tier: ~1 question per minute and ~40 per day per model. That is why the demo uses recorded conversations; a live version would need a paid plan or a queue.",
+    "Groq free tier: ~1 question per minute and ~40 per day per model. That is why the live chat answers one question at a time, limits each visitor and switches to a backup model when the main one runs out. If the daily quota runs out, it says so and points to these recorded conversations.",
     "The model sometimes copies a number wrong (e.g. wrote 96.2% when the database said 96.3%). Automatic verification flags these as “computed by the AI”, so the manager does not trust blindly.",
     "gpt-oss on Groq occasionally emits malformed calls (an internal marker in the tool name, “json” or “response” instead of “responder”). The API recovers them and re-validates the arguments; all covered by tests.",
     "36 questions show regressions and behavior, not robust statistics. Automatic checking uses numbers and keywords and can be wrong both ways: full answers are in the table above.",

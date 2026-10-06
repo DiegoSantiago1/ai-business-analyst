@@ -115,7 +115,7 @@ Avaliação (com a API rodando): `.venv\Scripts\python -m analista.avaliacao`.
 
 ## Limitações
 
-- Plano gratuito do Groq: ~1 pergunta por minuto e ~40 por dia por modelo. Por isso a demonstração pública é por conversas gravadas.
+- Plano gratuito do Groq: ~1 pergunta por minuto e ~40 por dia por modelo. O chat ao vivo responde uma pergunta por vez, limita cada visitante e passa para um modelo reserva; quando a cota do dia acaba, ele avisa e aponta para as conversas gravadas.
 - 36 perguntas mostram regressão e comportamento, não estatística robusta; a conferência automática pode errar nos dois sentidos (todas as respostas estão publicadas).
 - Dados fictícios e pequenos: bons para padrões plantados, não para conclusões de negócio.
 

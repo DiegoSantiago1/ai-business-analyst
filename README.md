@@ -115,7 +115,7 @@ Evaluation (with the API running): `.venv\Scripts\python -m analista.avaliacao`.
 
 ## Limitations
 
-- Groq free tier: ~1 question per minute and ~40 per day per model. That is why the public demo is recorded conversations.
+- Groq free tier: ~1 question per minute and ~40 per day per model. The live chat answers one question at a time, limits each visitor and falls back to a backup model; when the daily quota runs out, it says so and points to the recorded conversations.
 - 36 questions show regressions and behavior, not robust statistics; automatic checking can be wrong both ways (all answers are published).
 - Fictional, small dataset: good for planted patterns, not for business conclusions.
 
