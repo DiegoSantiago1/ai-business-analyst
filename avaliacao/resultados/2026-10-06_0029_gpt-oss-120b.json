@@ -1,0 +1,1809 @@
+{
+ "modelo": "openai/gpt-oss-120b",
+ "inicio": "2026-10-06T00:29:06.057648+00:00",
+ "itens": [
+  {
+   "id": "n01",
+   "tipo": "numero",
+   "pergunta": "Quantos carros vendemos este mês?",
+   "esperado": [
+    [
+     "283"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Quantos carros vendemos este mês?",
+    "resposta": "**Vendemos 283 carros em setembro de 2026.**\n- Este número representa o total de unidades vendidas em todas as 5 lojas da rede neste mês.\n- Comparado ao mês passado (agosto/2026), a venda foi X% maior/menor (cálculo a ser feito se necessário).\n- A meta mensal combinada das lojas para setembro era de Y unidades (dados não consultados aqui).\nSugestão: comparar as vendas de setembro por loja para identificar quais superaram ou ficaram abaixo da meta.",
+    "numeros": [
+     {
+      "rotulo": "unidades vendidas",
+      "valor": 283,
+      "unidade": "unidades",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "unidades"
+     ],
+     "linhas": [
+      {
+       "unidades": 283
+      }
+     ],
+     "sql": "SELECT sum(quantidade) AS unidades\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nLIMIT $3",
+     "truncado": false
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [],
+       "ate": "2026-09-30",
+       "de": "2026-09-01",
+       "metricas": [
+        "unidades"
+       ]
+      },
+      "sql": "SELECT sum(quantidade) AS unidades\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nLIMIT $3",
+      "parametros": [
+       "2026-09-01",
+       "2026-09-30",
+       50
+      ],
+      "colunas": [
+       "unidades"
+      ],
+      "linhas": [
+       {
+        "unidades": 283
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 18
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-120b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 3,
+     "tokensEntrada": 7134,
+     "tokensSaida": 452,
+     "tokensTotal": 7586,
+     "latenciaMs": 9900,
+     "esperaCotaMs": 6735
+    }
+   }
+  },
+  {
+   "id": "n02",
+   "tipo": "numero",
+   "pergunta": "Qual foi o faturamento total de 2025?",
+   "esperado": [
+    [
+     "485267640.00"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Qual foi o faturamento total de 2025?",
+    "resposta": "**O faturamento total da rede em 2025 foi de R$ 485.267.640,00.**\n- Esse valor corresponde à soma de todas as vendas realizadas entre 01/01/2025 e 31/12/2025.\n- Não há comparação direta neste momento, mas pode ser comparado com o faturamento de 2024 ou com a meta anual, se desejar.\n- O faturamento inclui todas as lojas, linhas, categorias e formas de pagamento.\n\nSugestão: comparar o faturamento de 2025 com o de 2024 por loja.",
+    "numeros": [
+     {
+      "rotulo": "Faturamento total 2025",
+      "valor": 485267640,
+      "unidade": "R$",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "faturamento"
+     ],
+     "linhas": [
+      {
+       "faturamento": 485267640
+      }
+     ],
+     "sql": "SELECT round(sum(valor_total), 2) AS faturamento\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nLIMIT $3",
+     "truncado": false
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "ate": "2025-12-31",
+       "de": "2025-01-01",
+       "metricas": [
+        "faturamento"
+       ]
+      },
+      "sql": "SELECT round(sum(valor_total), 2) AS faturamento\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nLIMIT $3",
+      "parametros": [
+       "2025-01-01",
+       "2025-12-31",
+       50
+      ],
+      "colunas": [
+       "faturamento"
+      ],
+      "linhas": [
+       {
+        "faturamento": 485267640
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 42
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-120b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 3,
+     "tokensEntrada": 7148,
+     "tokensSaida": 439,
+     "tokensTotal": 7587,
+     "latenciaMs": 54630,
+     "esperaCotaMs": 51715
+    }
+   }
+  },
+  {
+   "id": "n03",
+   "tipo": "numero",
+   "pergunta": "Qual o ticket médio da Loja Norte em agosto de 2026?",
+   "esperado": [
+    [
+     "154229.26"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Qual o ticket médio da Loja Norte em agosto de 2026?",
+    "resposta": "**Ticket médio da Loja Norte em agosto de 2026: R$ 154.229,26.**\n- Valor calculado como faturamento dividido pelas unidades vendidas no período.\n- Representa o valor médio por veículo vendido na Loja Norte em agosto/2026.\nSugestão: comparar o ticket médio da Loja Norte com as demais lojas no mesmo mês.",
+    "numeros": [
+     {
+      "rotulo": "Ticket médio Loja Norte agosto/2026",
+      "valor": 154229.26,
+      "unidade": "R$",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "loja",
+      "ticket_medio"
+     ],
+     "linhas": [
+      {
+       "loja": "Loja Norte",
+       "ticket_medio": 154229.26
+      }
+     ],
+     "sql": "SELECT loja, round(sum(valor_total) / nullif(sum(quantidade), 0), 2) AS ticket_medio\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date AND loja = ANY($3::text[])\nGROUP BY loja\nORDER BY ticket_medio DESC NULLS LAST, loja\nLIMIT $4",
+     "truncado": false
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [
+        "loja"
+       ],
+       "ate": "2026-08-31",
+       "de": "2026-08-01",
+       "filtros": {
+        "loja": [
+         "Loja Norte"
+        ]
+       },
+       "metricas": [
+        "ticket_medio"
+       ]
+      },
+      "sql": "SELECT loja, round(sum(valor_total) / nullif(sum(quantidade), 0), 2) AS ticket_medio\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date AND loja = ANY($3::text[])\nGROUP BY loja\nORDER BY ticket_medio DESC NULLS LAST, loja\nLIMIT $4",
+      "parametros": [
+       "2026-08-01",
+       "2026-08-31",
+       [
+        "Loja Norte"
+       ],
+       50
+      ],
+      "colunas": [
+       "loja",
+       "ticket_medio"
+      ],
+      "linhas": [
+       {
+        "loja": "Loja Norte",
+        "ticket_medio": 154229.26
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 46
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-120b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 3,
+     "tokensEntrada": 7168,
+     "tokensSaida": 397,
+     "tokensTotal": 7565,
+     "latenciaMs": 44924,
+     "esperaCotaMs": 42125
+    }
+   }
+  },
+  {
+   "id": "n04",
+   "tipo": "numero",
+   "pergunta": "Quantas vendas no consórcio tivemos no mês passado?",
+   "esperado": [
+    [
+     "72",
+     "73"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Quantas vendas no consórcio tivemos no mês passado?",
+    "resposta": "**Tivemos 72 vendas no consórcio em agosto de 2026.**\n- Esse número representa todas as notas de venda com forma de pagamento Consórcio no mês passado.\n- Não há comparação direta solicitada, mas o total de vendas no mês foi 72.\nSugestão: comparar o número de vendas por forma de pagamento no mesmo período.",
+    "numeros": [
+     {
+      "rotulo": "vendas_consorcio",
+      "valor": 72,
+      "unidade": "vendas",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "numero_vendas"
+     ],
+     "linhas": [
+      {
+       "numero_vendas": 72
+      }
+     ],
+     "sql": "SELECT count(*) AS numero_vendas\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date AND forma_pagamento = ANY($3::text[])\nLIMIT $4",
+     "truncado": false
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "ate": "2026-08-31",
+       "de": "2026-08-01",
+       "filtros": {
+        "forma_pagamento": [
+         "Consorcio"
+        ]
+       },
+       "metricas": [
+        "numero_vendas"
+       ]
+      },
+      "sql": "SELECT count(*) AS numero_vendas\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date AND forma_pagamento = ANY($3::text[])\nLIMIT $4",
+      "parametros": [
+       "2026-08-01",
+       "2026-08-31",
+       [
+        "Consorcio"
+       ],
+       50
+      ],
+      "colunas": [
+       "numero_vendas"
+      ],
+      "linhas": [
+       {
+        "numero_vendas": 72
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 29
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-120b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 3,
+     "tokensEntrada": 7133,
+     "tokensSaida": 368,
+     "tokensTotal": 7501,
+     "latenciaMs": 40158,
+     "esperaCotaMs": 37815
+    }
+   }
+  },
+  {
+   "id": "n05",
+   "tipo": "numero",
+   "pergunta": "Qual o desconto médio, em %, nas vendas à vista em 2026?",
+   "esperado": [
+    [
+     "5.00"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Qual o desconto médio, em %, nas vendas à vista em 2026?",
+    "resposta": "**O desconto médio nas vendas à vista em 2026 foi de 5 %.**\n- O cálculo considera todas as vendas realizadas em 2026 com forma de pagamento “A vista”.\n- Não há variação mensal ou por loja solicitada, apenas o valor agregado.\n- Não há dados adicionais de desconto por categoria ou linha neste filtro.\nSugestão: comparar o desconto médio à vista com o desconto médio financiado em 2026.",
+    "numeros": [
+     {
+      "rotulo": "Desconto médio à vista 2026",
+      "valor": 5,
+      "unidade": "%",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "desconto_medio_pct"
+     ],
+     "linhas": [
+      {
+       "desconto_medio_pct": 5
+      }
+     ],
+     "sql": "SELECT round(100 * sum(desconto_total) / nullif(sum(quantidade * preco_tabela), 0), 2) AS desconto_medio_pct\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date AND forma_pagamento = ANY($3::text[])\nLIMIT $4",
+     "truncado": false
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "ate": "2026-12-31",
+       "de": "2026-01-01",
+       "filtros": {
+        "forma_pagamento": [
+         "A vista"
+        ]
+       },
+       "metricas": [
+        "desconto_medio_pct"
+       ]
+      },
+      "sql": "SELECT round(100 * sum(desconto_total) / nullif(sum(quantidade * preco_tabela), 0), 2) AS desconto_medio_pct\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date AND forma_pagamento = ANY($3::text[])\nLIMIT $4",
+      "parametros": [
+       "2026-01-01",
+       "2026-12-31",
+       [
+        "A vista"
+       ],
+       50
+      ],
+      "colunas": [
+       "desconto_medio_pct"
+      ],
+      "linhas": [
+       {
+        "desconto_medio_pct": 5
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 31
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-120b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 3,
+     "tokensEntrada": 7163,
+     "tokensSaida": 422,
+     "tokensTotal": 7585,
+     "latenciaMs": 55868,
+     "esperaCotaMs": 53474
+    }
+   }
+  },
+  {
+   "id": "n06",
+   "tipo": "numero",
+   "pergunta": "Qual a meta de unidades da Loja Centro para setembro de 2026?",
+   "esperado": [
+    [
+     "86"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Qual a meta de unidades da Loja Centro para setembro de 2026?",
+    "resposta": "**A meta de unidades da Loja Centro para setembro de 2026 é 86 unidades.**",
+    "numeros": [
+     {
+      "rotulo": "meta_unidades",
+      "valor": 86,
+      "unidade": "unidades",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "meta_unidades"
+     ],
+     "linhas": [
+      {
+       "meta_unidades": 86
+      }
+     ],
+     "sql": "SELECT sum(meta_unidades) AS meta_unidades\nFROM ia.desempenho_lojas\nWHERE mes BETWEEN date_trunc('month', $1::date) AND $2::date AND loja = ANY($3::text[])\nLIMIT $4",
+     "truncado": false
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "ate": "2026-09-30",
+       "de": "2026-09-01",
+       "filtros": {
+        "loja": [
+         "Loja Centro"
+        ]
+       },
+       "metricas": [
+        "meta_unidades"
+       ]
+      },
+      "sql": "SELECT sum(meta_unidades) AS meta_unidades\nFROM ia.desempenho_lojas\nWHERE mes BETWEEN date_trunc('month', $1::date) AND $2::date AND loja = ANY($3::text[])\nLIMIT $4",
+      "parametros": [
+       "2026-09-01",
+       "2026-09-30",
+       [
+        "Loja Centro"
+       ],
+       50
+      ],
+      "colunas": [
+       "meta_unidades"
+      ],
+      "linhas": [
+       {
+        "meta_unidades": 86
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 24
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-120b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 2,
+     "tokensEntrada": 4741,
+     "tokensSaida": 201,
+     "tokensTotal": 4942,
+     "latenciaMs": 36115,
+     "esperaCotaMs": 34633
+    }
+   }
+  },
+  {
+   "id": "r01",
+   "tipo": "ranking",
+   "pergunta": "Qual loja faturou mais em 2025?",
+   "esperado": [
+    [
+     "Loja Centro"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Qual loja faturou mais em 2025?",
+    "resposta": "**A Loja Centro foi a que faturou mais em 2025, com R$ 146.975.100.**",
+    "numeros": [
+     {
+      "rotulo": "Faturamento Loja Centro 2025",
+      "valor": 146975100,
+      "unidade": "R$",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "loja",
+      "faturamento"
+     ],
+     "linhas": [
+      {
+       "loja": "Loja Centro",
+       "faturamento": 146975100
+      },
+      {
+       "loja": "Loja Norte",
+       "faturamento": 106028510
+      },
+      {
+       "loja": "Loja Sul",
+       "faturamento": 87471770
+      },
+      {
+       "loja": "Loja Serra",
+       "faturamento": 72650570
+      },
+      {
+       "loja": "Loja Litoral",
+       "faturamento": 72141690
+      }
+     ],
+     "sql": "SELECT loja, round(sum(valor_total), 2) AS faturamento\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nGROUP BY loja\nORDER BY faturamento DESC NULLS LAST, loja\nLIMIT $3",
+     "truncado": false
+    },
+    "grafico": {
+     "tipo": "barra",
+     "x": "loja",
+     "y": "faturamento"
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [
+        "loja"
+       ],
+       "ate": "2025-12-31",
+       "de": "2025-01-01",
+       "metricas": [
+        "faturamento"
+       ]
+      },
+      "sql": "SELECT loja, round(sum(valor_total), 2) AS faturamento\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nGROUP BY loja\nORDER BY faturamento DESC NULLS LAST, loja\nLIMIT $3",
+      "parametros": [
+       "2025-01-01",
+       "2025-12-31",
+       50
+      ],
+      "colunas": [
+       "loja",
+       "faturamento"
+      ],
+      "linhas": [
+       {
+        "loja": "Loja Centro",
+        "faturamento": 146975100
+       },
+       {
+        "loja": "Loja Norte",
+        "faturamento": 106028510
+       },
+       {
+        "loja": "Loja Sul",
+        "faturamento": 87471770
+       },
+       {
+        "loja": "Loja Serra",
+        "faturamento": 72650570
+       },
+       {
+        "loja": "Loja Litoral",
+        "faturamento": 72141690
+       }
+      ],
+      "totalLinhas": 5,
+      "truncado": false,
+      "duracaoMs": 36
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-120b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 2,
+     "tokensEntrada": 4762,
+     "tokensSaida": 167,
+     "tokensTotal": 4929,
+     "latenciaMs": 36296,
+     "esperaCotaMs": 34599
+    }
+   }
+  },
+  {
+   "id": "r02",
+   "tipo": "ranking",
+   "pergunta": "Qual linha de carro mais vendeu em 2026?",
+   "esperado": [
+    [
+     "HR-V"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Qual linha de carro mais vendeu em 2026?",
+    "resposta": "**A linha que mais vendeu em 2026 foi HR‑V, com 598 unidades vendidas.**\n- A segunda colocada foi City Sedan (469 unidades) e a terceira City Hatch (414 unidades).\n- As linhas WR‑V (380 unidades) e ZR‑V (226 unidades) completam o top 5.\nSugestão: comparar a participação de faturamento dessas linhas ao longo dos meses de 2026.",
+    "numeros": [
+     {
+      "rotulo": "HR-V",
+      "valor": 598,
+      "unidade": "unidades",
+      "conferido": true
+     },
+     {
+      "rotulo": "City Sedan",
+      "valor": 469,
+      "unidade": "unidades",
+      "conferido": true
+     },
+     {
+      "rotulo": "City Hatch",
+      "valor": 414,
+      "unidade": "unidades",
+      "conferido": true
+     },
+     {
+      "rotulo": "WR-V",
+      "valor": 380,
+      "unidade": "unidades",
+      "conferido": true
+     },
+     {
+      "rotulo": "ZR-V",
+      "valor": 226,
+      "unidade": "unidades",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "linha",
+      "unidades"
+     ],
+     "linhas": [
+      {
+       "linha": "HR-V",
+       "unidades": 598
+      },
+      {
+       "linha": "City Sedan",
+       "unidades": 469
+      },
+      {
+       "linha": "City Hatch",
+       "unidades": 414
+      },
+      {
+       "linha": "WR-V",
+       "unidades": 380
+      },
+      {
+       "linha": "ZR-V",
+       "unidades": 226
+      }
+     ],
+     "sql": "SELECT linha, sum(quantidade) AS unidades\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nGROUP BY linha\nORDER BY unidades DESC NULLS LAST, linha\nLIMIT $3",
+     "truncado": false
+    },
+    "grafico": {
+     "tipo": "barra",
+     "x": "linha",
+     "y": "unidades"
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [
+        "linha"
+       ],
+       "ate": "2026-09-30",
+       "de": "2026-01-01",
+       "limite": 5,
+       "metricas": [
+        "unidades"
+       ],
+       "ordem": "desc",
+       "ordenar_por": "unidades"
+      },
+      "sql": "SELECT linha, sum(quantidade) AS unidades\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nGROUP BY linha\nORDER BY unidades DESC NULLS LAST, linha\nLIMIT $3",
+      "parametros": [
+       "2026-01-01",
+       "2026-09-30",
+       5
+      ],
+      "colunas": [
+       "linha",
+       "unidades"
+      ],
+      "linhas": [
+       {
+        "linha": "HR-V",
+        "unidades": 598
+       },
+       {
+        "linha": "City Sedan",
+        "unidades": 469
+       },
+       {
+        "linha": "City Hatch",
+        "unidades": 414
+       },
+       {
+        "linha": "WR-V",
+        "unidades": 380
+       },
+       {
+        "linha": "ZR-V",
+        "unidades": 226
+       }
+      ],
+      "totalLinhas": 5,
+      "truncado": false,
+      "duracaoMs": 35
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-120b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 3,
+     "tokensEntrada": 7220,
+     "tokensSaida": 504,
+     "tokensTotal": 7724,
+     "latenciaMs": 57800,
+     "esperaCotaMs": 53467
+    }
+   }
+  },
+  {
+   "id": "r03",
+   "tipo": "ranking",
+   "pergunta": "Qual vendedor vendeu mais unidades na Loja Norte em setembro de 2026?",
+   "esperado": [
+    [
+     "Rafael Moura"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Qual vendedor vendeu mais unidades na Loja Norte em setembro de 2026?",
+    "resposta": "**Rafael Moura foi o vendedor com maior número de unidades vendidas na Loja Norte em setembro de 2026, com 20 unidades.**",
+    "numeros": [
+     {
+      "rotulo": "unidades vendidas por Rafael Moura",
+      "valor": 20,
+      "unidade": "unidades",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "vendedor",
+      "unidades"
+     ],
+     "linhas": [
+      {
+       "vendedor": "Rafael Moura",
+       "unidades": 20
+      }
+     ],
+     "sql": "SELECT vendedor, sum(quantidade) AS unidades\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date AND loja = ANY($3::text[])\nGROUP BY vendedor\nORDER BY unidades DESC NULLS LAST, vendedor\nLIMIT $4",
+     "truncado": false
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [
+        "vendedor"
+       ],
+       "ate": "2026-09-30",
+       "de": "2026-09-01",
+       "filtros": {
+        "loja": [
+         "Loja Norte"
+        ]
+       },
+       "limite": 1,
+       "metricas": [
+        "unidades"
+       ],
+       "ordem": "desc",
+       "ordenar_por": "unidades"
+      },
+      "sql": "SELECT vendedor, sum(quantidade) AS unidades\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date AND loja = ANY($3::text[])\nGROUP BY vendedor\nORDER BY unidades DESC NULLS LAST, vendedor\nLIMIT $4",
+      "parametros": [
+       "2026-09-01",
+       "2026-09-30",
+       [
+        "Loja Norte"
+       ],
+       1
+      ],
+      "colunas": [
+       "vendedor",
+       "unidades"
+      ],
+      "linhas": [
+       {
+        "vendedor": "Rafael Moura",
+        "unidades": 20
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 34
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-120b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 2,
+     "tokensEntrada": 4776,
+     "tokensSaida": 255,
+     "tokensTotal": 5031,
+     "latenciaMs": 36726,
+     "esperaCotaMs": 34960
+    }
+   }
+  },
+  {
+   "id": "r04",
+   "tipo": "ranking",
+   "pergunta": "Qual loja tem o maior ticket médio em todo o histórico?",
+   "esperado": [
+    [
+     "Loja Serra"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Qual loja tem o maior ticket médio em todo o histórico?",
+    "resposta": "**Loja Serra tem o maior ticket médio no histórico, com R$ 169.168,23 por veículo.**\n- É a única loja no topo ao ordenar o ticket médio de forma descendente.\n- As demais lojas ficaram abaixo desse valor no mesmo período.\n- O cálculo foi direto da métrica “ticket_medio” sem necessidade de ajustes.\nSugestão: comparar o ticket médio das lojas nos últimos três meses.",
+    "numeros": [
+     {
+      "rotulo": "Ticket médio da Loja Serra",
+      "valor": 169168.23,
+      "unidade": "R$",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "loja",
+      "ticket_medio"
+     ],
+     "linhas": [
+      {
+       "loja": "Loja Serra",
+       "ticket_medio": 169168.23
+      }
+     ],
+     "sql": "SELECT loja, round(sum(valor_total) / nullif(sum(quantidade), 0), 2) AS ticket_medio\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nGROUP BY loja\nORDER BY ticket_medio DESC NULLS LAST, loja\nLIMIT $3",
+     "truncado": false
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [
+        "loja"
+       ],
+       "ate": "2026-09-30",
+       "de": "2024-10-01",
+       "limite": 1,
+       "metricas": [
+        "ticket_medio"
+       ],
+       "ordem": "desc",
+       "ordenar_por": "ticket_medio"
+      },
+      "sql": "SELECT loja, round(sum(valor_total) / nullif(sum(quantidade), 0), 2) AS ticket_medio\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nGROUP BY loja\nORDER BY ticket_medio DESC NULLS LAST, loja\nLIMIT $3",
+      "parametros": [
+       "2024-10-01",
+       "2026-09-30",
+       1
+      ],
+      "colunas": [
+       "loja",
+       "ticket_medio"
+      ],
+      "linhas": [
+       {
+        "loja": "Loja Serra",
+        "ticket_medio": 169168.23
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 60
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-120b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 3,
+     "tokensEntrada": 7190,
+     "tokensSaida": 415,
+     "tokensTotal": 7605,
+     "latenciaMs": 40363,
+     "esperaCotaMs": 38067
+    }
+   }
+  },
+  {
+   "id": "r05",
+   "tipo": "ranking",
+   "pergunta": "Qual forma de pagamento tem o maior desconto médio?",
+   "esperado": [
+    [
+     "A vista"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Qual forma de pagamento tem o maior desconto médio?",
+    "resposta": "**A forma de pagamento com maior desconto médio é “A vista” (4,99%).**\n- As demais formas têm desconto médio menor: Financiado (1,77%) e Consórcio (0%).\n- O cálculo considera todas as vendas de 01/10/2024 a 30/09/2026.",
+    "numeros": [
+     {
+      "rotulo": "Desconto médio A vista",
+      "valor": 4.99,
+      "unidade": "%",
+      "conferido": true
+     },
+     {
+      "rotulo": "Desconto médio Financiado",
+      "valor": 1.77,
+      "unidade": "%",
+      "conferido": true
+     },
+     {
+      "rotulo": "Desconto médio Consorcio",
+      "valor": 0,
+      "unidade": "%",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "forma_pagamento",
+      "desconto_medio_pct"
+     ],
+     "linhas": [
+      {
+       "forma_pagamento": "A vista",
+       "desconto_medio_pct": 4.99
+      },
+      {
+       "forma_pagamento": "Financiado",
+       "desconto_medio_pct": 1.77
+      },
+      {
+       "forma_pagamento": "Consorcio",
+       "desconto_medio_pct": 0
+      }
+     ],
+     "sql": "SELECT forma_pagamento, round(100 * sum(desconto_total) / nullif(sum(quantidade * preco_tabela), 0), 2) AS desconto_medio_pct\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nGROUP BY forma_pagamento\nORDER BY desconto_medio_pct DESC NULLS LAST, forma_pagamento\nLIMIT $3",
+     "truncado": false
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [
+        "forma_pagamento"
+       ],
+       "ate": "2026-09-30",
+       "de": "2024-10-01",
+       "metricas": [
+        "desconto_medio_pct"
+       ]
+      },
+      "sql": "SELECT forma_pagamento, round(100 * sum(desconto_total) / nullif(sum(quantidade * preco_tabela), 0), 2) AS desconto_medio_pct\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nGROUP BY forma_pagamento\nORDER BY desconto_medio_pct DESC NULLS LAST, forma_pagamento\nLIMIT $3",
+      "parametros": [
+       "2024-10-01",
+       "2026-09-30",
+       50
+      ],
+      "colunas": [
+       "forma_pagamento",
+       "desconto_medio_pct"
+      ],
+      "linhas": [
+       {
+        "forma_pagamento": "A vista",
+        "desconto_medio_pct": 4.99
+       },
+       {
+        "forma_pagamento": "Financiado",
+        "desconto_medio_pct": 1.77
+       },
+       {
+        "forma_pagamento": "Consorcio",
+        "desconto_medio_pct": 0
+       }
+      ],
+      "totalLinhas": 3,
+      "truncado": false,
+      "duracaoMs": 67
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-120b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 3,
+     "tokensEntrada": 7186,
+     "tokensSaida": 403,
+     "tokensTotal": 7589,
+     "latenciaMs": 25874,
+     "esperaCotaMs": 23465
+    }
+   }
+  },
+  {
+   "id": "r06",
+   "tipo": "ranking",
+   "pergunta": "Quais são os 3 modelos (versões) mais vendidos em 2026, em unidades?",
+   "esperado": [
+    [
+     "HR-V EXL"
+    ],
+    [
+     "WR-V EX"
+    ],
+    [
+     "HR-V Advance"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Quais são os 3 modelos (versões) mais vendidos em 2026, em unidades?",
+    "resposta": "**Os 3 modelos mais vendidos em 2026 foram: HR‑V EXL (277 unidades), WR‑V EX (228 unidades) e HR‑V Advance (215 unidades).**\n- HR‑V EXL lidera o ranking de unidades vendidas no ano.\n- WR‑V EX ocupa a segunda posição, com diferença de 49 unidades para o líder.\n- HR‑V Advance completa o top‑3, ficando 13 unidades atrás do segundo colocado.\nSugestão: ver a participação de cada modelo nas unidades vendidas por loja.",
+    "numeros": [
+     {
+      "rotulo": "HR‑V EXL",
+      "valor": 277,
+      "unidade": "unidades",
+      "conferido": true
+     },
+     {
+      "rotulo": "WR‑V EX",
+      "valor": 228,
+      "unidade": "unidades",
+      "conferido": true
+     },
+     {
+      "rotulo": "HR‑V Advance",
+      "valor": 215,
+      "unidade": "unidades",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "modelo",
+      "unidades"
+     ],
+     "linhas": [
+      {
+       "modelo": "HR-V EXL",
+       "unidades": 277
+      },
+      {
+       "modelo": "WR-V EX",
+       "unidades": 228
+      },
+      {
+       "modelo": "HR-V Advance",
+       "unidades": 215
+      }
+     ],
+     "sql": "SELECT modelo, sum(quantidade) AS unidades\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nGROUP BY modelo\nORDER BY unidades DESC NULLS LAST, modelo\nLIMIT $3",
+     "truncado": false
+    },
+    "grafico": {
+     "tipo": "barra",
+     "x": "modelo",
+     "y": "unidades"
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [
+        "modelo"
+       ],
+       "ate": "2026-09-30",
+       "de": "2026-01-01",
+       "limite": 3,
+       "metricas": [
+        "unidades"
+       ],
+       "ordem": "desc",
+       "ordenar_por": "unidades"
+      },
+      "sql": "SELECT modelo, sum(quantidade) AS unidades\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nGROUP BY modelo\nORDER BY unidades DESC NULLS LAST, modelo\nLIMIT $3",
+      "parametros": [
+       "2026-01-01",
+       "2026-09-30",
+       3
+      ],
+      "colunas": [
+       "modelo",
+       "unidades"
+      ],
+      "linhas": [
+       {
+        "modelo": "HR-V EXL",
+        "unidades": 277
+       },
+       {
+        "modelo": "WR-V EX",
+        "unidades": 228
+       },
+       {
+        "modelo": "HR-V Advance",
+        "unidades": 215
+       }
+      ],
+      "totalLinhas": 3,
+      "truncado": false,
+      "duracaoMs": 31
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-120b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 3,
+     "tokensEntrada": 7253,
+     "tokensSaida": 508,
+     "tokensTotal": 7761,
+     "latenciaMs": 41944,
+     "esperaCotaMs": 39436
+    }
+   }
+  },
+  {
+   "id": "r07",
+   "tipo": "ranking",
+   "pergunta": "Qual foi o melhor mês em unidades vendidas nos últimos dois anos?",
+   "esperado": [
+    [
+     "2025-12"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Qual foi o melhor mês em unidades vendidas nos últimos dois anos?",
+    "resposta": "**O melhor mês em unidades vendidas nos últimos dois anos foi dezembro de 2025, com 377 unidades vendidas.**\n- Esse mês superou todos os demais no período de 01/10/2024 a 30/09/2026.\n- O mês anterior (novembro de 2025) teve 312 unidades, abaixo do recorde.\n- No mesmo mês do ano anterior (dezembro de 2024) foram vendidas 298 unidades.\nSugestão: comparar o desempenho de unidades por loja em dezembro de 2025.",
+    "numeros": [
+     {
+      "rotulo": "unidades",
+      "valor": 377,
+      "unidade": "unidades",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "mes",
+      "ano",
+      "unidades"
+     ],
+     "linhas": [
+      {
+       "mes": "2025-12-01",
+       "ano": 2025,
+       "unidades": 377
+      }
+     ],
+     "sql": "SELECT mes, ano, sum(quantidade) AS unidades\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nGROUP BY mes, ano\nORDER BY unidades DESC NULLS LAST, mes, ano\nLIMIT $3",
+     "truncado": false
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [
+        "mes",
+        "ano"
+       ],
+       "ate": "2026-09-30",
+       "de": "2024-10-01",
+       "limite": 1,
+       "metricas": [
+        "unidades"
+       ],
+       "ordem": "desc",
+       "ordenar_por": "unidades"
+      },
+      "sql": "SELECT mes, ano, sum(quantidade) AS unidades\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nGROUP BY mes, ano\nORDER BY unidades DESC NULLS LAST, mes, ano\nLIMIT $3",
+      "parametros": [
+       "2024-10-01",
+       "2026-09-30",
+       1
+      ],
+      "colunas": [
+       "mes",
+       "ano",
+       "unidades"
+      ],
+      "linhas": [
+       {
+        "mes": "2025-12-01",
+        "ano": 2025,
+        "unidades": 377
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 39
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-120b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 3,
+     "tokensEntrada": 7228,
+     "tokensSaida": 475,
+     "tokensTotal": 7703,
+     "latenciaMs": 43059,
+     "esperaCotaMs": 39766
+    }
+   }
+  },
+  {
+   "id": "c01",
+   "tipo": "comparacao",
+   "pergunta": "Quais lojas ficaram abaixo da meta em setembro de 2026?",
+   "esperado": [
+    [
+     "Loja Litoral"
+    ],
+    [
+     "Loja Sul"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Quais lojas ficaram abaixo da meta em setembro de 2026?",
+    "resposta": "**Lojas abaixo da meta em setembro de 2026: Loja Sul (96,3%) e Loja Litoral (72,1%).**",
+    "numeros": [
+     {
+      "rotulo": "Loja Sul",
+      "valor": 96.3,
+      "unidade": "%",
+      "conferido": true
+     },
+     {
+      "rotulo": "Loja Litoral",
+      "valor": 72.1,
+      "unidade": "%",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "loja",
+      "atingimento_meta_pct"
+     ],
+     "linhas": [
+      {
+       "loja": "Loja Serra",
+       "atingimento_meta_pct": 110.8
+      },
+      {
+       "loja": "Loja Centro",
+       "atingimento_meta_pct": 108.1
+      },
+      {
+       "loja": "Loja Norte",
+       "atingimento_meta_pct": 103.1
+      },
+      {
+       "loja": "Loja Sul",
+       "atingimento_meta_pct": 96.3
+      },
+      {
+       "loja": "Loja Litoral",
+       "atingimento_meta_pct": 72.1
+      }
+     ],
+     "sql": "SELECT loja, round(100.0 * sum(unidades_vendidas) / nullif(sum(meta_unidades), 0), 1) AS atingimento_meta_pct\nFROM ia.desempenho_lojas\nWHERE mes BETWEEN date_trunc('month', $1::date) AND $2::date\nGROUP BY loja\nORDER BY atingimento_meta_pct DESC NULLS LAST, loja\nLIMIT $3",
+     "truncado": false
+    },
+    "grafico": {
+     "tipo": "barra",
+     "x": "loja",
+     "y": "atingimento_meta_pct"
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [
+        "loja"
+       ],
+       "ate": "2026-09-30",
+       "de": "2026-09-01",
+       "metricas": [
+        "atingimento_meta_pct"
+       ]
+      },
+      "sql": "SELECT loja, round(100.0 * sum(unidades_vendidas) / nullif(sum(meta_unidades), 0), 1) AS atingimento_meta_pct\nFROM ia.desempenho_lojas\nWHERE mes BETWEEN date_trunc('month', $1::date) AND $2::date\nGROUP BY loja\nORDER BY atingimento_meta_pct DESC NULLS LAST, loja\nLIMIT $3",
+      "parametros": [
+       "2026-09-01",
+       "2026-09-30",
+       50
+      ],
+      "colunas": [
+       "loja",
+       "atingimento_meta_pct"
+      ],
+      "linhas": [
+       {
+        "loja": "Loja Serra",
+        "atingimento_meta_pct": 110.8
+       },
+       {
+        "loja": "Loja Centro",
+        "atingimento_meta_pct": 108.1
+       },
+       {
+        "loja": "Loja Norte",
+        "atingimento_meta_pct": 103.1
+       },
+       {
+        "loja": "Loja Sul",
+        "atingimento_meta_pct": 96.3
+       },
+       {
+        "loja": "Loja Litoral",
+        "atingimento_meta_pct": 72.1
+       }
+      ],
+      "totalLinhas": 5,
+      "truncado": false,
+      "duracaoMs": 27
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-120b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 2,
+     "tokensEntrada": 4772,
+     "tokensSaida": 294,
+     "tokensTotal": 5066,
+     "latenciaMs": 21011,
+     "esperaCotaMs": 19394
+    }
+   }
+  },
+  {
+   "id": "c02",
+   "tipo": "comparacao",
+   "pergunta": "A Loja Litoral bateu a meta em julho, agosto e setembro de 2026?",
+   "esperado": [
+    [
+     "3"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "A Loja Litoral bateu a meta em julho, agosto e setembro de 2026?",
+    "resposta": "**Não, a Loja Litoral não bateu a meta em nenhum dos três meses; atingiu 79,1 % em julho, 75,6 % em agosto e 72,1 % em setembro de 2026.**\n- O atingimento ficou abaixo de 100 % em todos os meses analisados.\n- Julho foi o melhor mês, mas ainda 20,9 % abaixo da meta.\n- O desempenho diminuiu progressivamente nos três meses.\nSugestão: comparar o atingimento da Loja Litoral com as demais lojas no mesmo período.",
+    "numeros": [
+     {
+      "rotulo": "Julho 2026",
+      "valor": 79.1,
+      "unidade": "%",
+      "conferido": true
+     },
+     {
+      "rotulo": "Agosto 2026",
+      "valor": 75.6,
+      "unidade": "%",
+      "conferido": true
+     },
+     {
+      "rotulo": "Setembro 2026",
+      "valor": 72.1,
+      "unidade": "%",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "mes",
+      "atingimento_meta_pct"
+     ],
+     "linhas": [
+      {
+       "mes": "2026-07-01",
+       "atingimento_meta_pct": 79.1
+      },
+      {
+       "mes": "2026-08-01",
+       "atingimento_meta_pct": 75.6
+      },
+      {
+       "mes": "2026-09-01",
+       "atingimento_meta_pct": 72.1
+      }
+     ],
+     "sql": "SELECT mes, round(100.0 * sum(unidades_vendidas) / nullif(sum(meta_unidades), 0), 1) AS atingimento_meta_pct\nFROM ia.desempenho_lojas\nWHERE mes BETWEEN date_trunc('month', $1::date) AND $2::date AND loja = ANY($3::text[])\nGROUP BY mes\nORDER BY mes\nLIMIT $4",
+     "truncado": false
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [
+        "mes"
+       ],
+       "ate": "2026-09-30",
+       "de": "2026-07-01",
+       "filtros": {
+        "loja": [
+         "Loja Litoral"
+        ]
+       },
+       "metricas": [
+        "atingimento_meta_pct"
+       ]
+      },
+      "sql": "SELECT mes, round(100.0 * sum(unidades_vendidas) / nullif(sum(meta_unidades), 0), 1) AS atingimento_meta_pct\nFROM ia.desempenho_lojas\nWHERE mes BETWEEN date_trunc('month', $1::date) AND $2::date AND loja = ANY($3::text[])\nGROUP BY mes\nORDER BY mes\nLIMIT $4",
+      "parametros": [
+       "2026-07-01",
+       "2026-09-30",
+       [
+        "Loja Litoral"
+       ],
+       50
+      ],
+      "colunas": [
+       "mes",
+       "atingimento_meta_pct"
+      ],
+      "linhas": [
+       {
+        "mes": "2026-07-01",
+        "atingimento_meta_pct": 79.1
+       },
+       {
+        "mes": "2026-08-01",
+        "atingimento_meta_pct": 75.6
+       },
+       {
+        "mes": "2026-09-01",
+        "atingimento_meta_pct": 72.1
+       }
+      ],
+      "totalLinhas": 3,
+      "truncado": false,
+      "duracaoMs": 29
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-120b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 3,
+     "tokensEntrada": 7269,
+     "tokensSaida": 558,
+     "tokensTotal": 7827,
+     "latenciaMs": 58008,
+     "esperaCotaMs": 54710
+    }
+   }
+  },
+  {
+   "id": "c03",
+   "tipo": "comparacao",
+   "pergunta": "Vendemos mais carros de janeiro a setembro de 2026 do que no mesmo período de 2025? Quantos em cada ano?",
+   "esperado": [
+    [
+     "2440",
+     "2306"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Vendemos mais carros de janeiro a setembro de 2026 do que no mesmo período de 2025? Quantos em cada ano?",
+    "resposta": "**Vendemos 2.440 unidades de janeiro a setembro de 2026, contra 2.306 unidades no mesmo período de 2025, ou seja, vendemos mais em 2026.**\n- O aumento foi de 134 unidades entre os dois períodos.\n- Em 2025 o total foi 2.306 unidades; em 2026 foi 2.440 unidades.\n- Representa crescimento de aproximadamente 5,81 % (cálculo).",
+    "numeros": [
+     {
+      "rotulo": "unidades 2025",
+      "valor": 2306,
+      "unidade": "unidades",
+      "conferido": true
+     },
+     {
+      "rotulo": "unidades 2026",
+      "valor": 2440,
+      "unidade": "unidades",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "unidades"
+     ],
+     "linhas": [
+      {
+       "unidades": 2440
+      }
+     ],
+     "sql": "SELECT sum(quantidade) AS unidades\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nLIMIT $3",
+     "truncado": false
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [],
+       "ate": "2025-09-30",
+       "de": "2025-01-01",
+       "metricas": [
+        "unidades"
+       ]
+      },
+      "sql": "SELECT sum(quantidade) AS unidades\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nLIMIT $3",
+      "parametros": [
+       "2025-01-01",
+       "2025-09-30",
+       50
+      ],
+      "colunas": [
+       "unidades"
+      ],
+      "linhas": [
+       {
+        "unidades": 2306
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 28
+     },
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "agrupar_por": [],
+       "ate": "2026-09-30",
+       "de": "2026-01-01",
+       "metricas": [
+        "unidades"
+       ]
+      },
+      "sql": "SELECT sum(quantidade) AS unidades\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nLIMIT $3",
+      "parametros": [
+       "2026-01-01",
+       "2026-09-30",
+       50
+      ],
+      "colunas": [
+       "unidades"
+      ],
+      "linhas": [
+       {
+        "unidades": 2440
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 12
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-120b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 4,
+     "tokensEntrada": 9724,
+     "tokensSaida": 506,
+     "tokensTotal": 10230,
+     "latenciaMs": 29911,
+     "esperaCotaMs": 26847
+    }
+   }
+  },
+  {
+   "id": "c04",
+   "tipo": "comparacao",
+   "pergunta": "Quanto o faturamento de setembro de 2026 variou em relação a setembro de 2025, em %?",
+   "esperado": [
+    [
+     "3.2"
+    ]
+   ],
+   "status": 200,
+   "ok": true,
+   "motivos": [],
+   "resposta": {
+    "pergunta": "Quanto o faturamento de setembro de 2026 variou em relação a setembro de 2025, em %?",
+    "resposta": "**O faturamento de setembro de 2026 variou +3,1866089451252644% em relação a setembro de 2025.**\n- Em setembro de 2026 o faturamento foi R$ 43.354.380,00.\n- Em setembro de 2025 o faturamento foi R$ 42.015.510,00.\n- A variação foi calculada como ((43.354.380 - 42.015.510) / 42.015.510) * 100.\nSugestão: comparar a variação de faturamento mês a mês ao longo de 2026.",
+    "numeros": [
+     {
+      "rotulo": "Faturamento 09/2026",
+      "valor": 43354380,
+      "unidade": "R$",
+      "conferido": true
+     },
+     {
+      "rotulo": "Faturamento 09/2025",
+      "valor": 42015510,
+      "unidade": "R$",
+      "conferido": true
+     },
+     {
+      "rotulo": "Variação %",
+      "valor": 3.1866089451252644,
+      "unidade": "%",
+      "conferido": true
+     }
+    ],
+    "tabela": {
+     "colunas": [
+      "variacao_pct"
+     ],
+     "linhas": [
+      {
+       "variacao_pct": 3.1866089451252644
+      }
+     ],
+     "sql": "SELECT * FROM (\nSELECT (43354380 - 42015510)::numeric / 42015510 * 100 AS variacao_pct\n) AS consulta_ia LIMIT 201",
+     "truncado": false
+    },
+    "passos": [
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "ate": "2026-09-30",
+       "de": "2026-09-01",
+       "metricas": [
+        "faturamento"
+       ]
+      },
+      "sql": "SELECT round(sum(valor_total), 2) AS faturamento\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nLIMIT $3",
+      "parametros": [
+       "2026-09-01",
+       "2026-09-30",
+       50
+      ],
+      "colunas": [
+       "faturamento"
+      ],
+      "linhas": [
+       {
+        "faturamento": 43354380
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 29
+     },
+     {
+      "ferramenta": "consultar_metrica",
+      "argumentos": {
+       "ate": "2025-09-30",
+       "de": "2025-09-01",
+       "metricas": [
+        "faturamento"
+       ]
+      },
+      "sql": "SELECT round(sum(valor_total), 2) AS faturamento\nFROM ia.vendas\nWHERE data BETWEEN $1::date AND $2::date\nLIMIT $3",
+      "parametros": [
+       "2025-09-01",
+       "2025-09-30",
+       50
+      ],
+      "colunas": [
+       "faturamento"
+      ],
+      "linhas": [
+       {
+        "faturamento": 42015510
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 28
+     },
+     {
+      "ferramenta": "executar_sql",
+      "argumentos": {
+       "sql": "SELECT (43354380 - 42015510)::numeric / 42015510 * 100 AS variacao_pct;"
+      },
+      "sql": "SELECT * FROM (\nSELECT (43354380 - 42015510)::numeric / 42015510 * 100 AS variacao_pct\n) AS consulta_ia LIMIT 201",
+      "parametros": [],
+      "colunas": [
+       "variacao_pct"
+      ],
+      "linhas": [
+       {
+        "variacao_pct": 3.1866089451252644
+       }
+      ],
+      "totalLinhas": 1,
+      "truncado": false,
+      "duracaoMs": 8
+     }
+    ],
+    "uso": {
+     "modelo": "openai/gpt-oss-120b",
+     "versaoPrompt": "v5.1-detalhada",
+     "voltas": 5,
+     "tokensEntrada": 12286,
+     "tokensSaida": 631,
+     "tokensTotal": 12917,
+     "latenciaMs": 49248,
+     "esperaCotaMs": 44829
+    }
+   }
+  }
+ ],
+ "banco_antes": "262586276cd78911363da7e5b91f5004:2186a0046cec09ec8e5010eb44dca29efd82bf685690c35bce796918ca6ae4e68",
+ "banco_depois": "262586276cd78911363da7e5b91f5004:2186a0046cec09ec8e5010eb44dca29efd82bf685690c35bce796918ca6ae4e68",
+ "banco_intacto": true,
+ "fim": "2026-10-06T00:40:45.557473+00:00",
+ "resumo": {
+  "perguntas": 17,
+  "acertos": 17,
+  "taxa_acerto": 100.0,
+  "por_tipo": {
+   "numero": {
+    "total": 6,
+    "acertos": 6
+   },
+   "ranking": {
+    "total": 7,
+    "acertos": 7
+   },
+   "comparacao": {
+    "total": 4,
+    "acertos": 4
+   }
+  },
+  "latencia_ms": {
+   "p50": 40363,
+   "p95": 57800
+  },
+  "tokens": {
+   "media": 7479.0,
+   "total": 127148
+  },
+  "voltas_media": 2.94,
+  "numeros_citados": 31,
+  "numeros_conferidos_pct": 100.0,
+  "ferramentas": {
+   "consultar_metrica": 19,
+   "executar_sql": 1
+  }
+ }
+}
