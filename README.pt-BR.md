@@ -1,5 +1,7 @@
 # AI Business Analyst
 
+[![ci](https://github.com/DiegoSantiago1/ai-business-analyst/actions/workflows/ci.yml/badge.svg)](https://github.com/DiegoSantiago1/ai-business-analyst/actions/workflows/ci.yml)
+
 Um analista de dados com IA para uma rede de concessionárias: o gerente pergunta em português, um LLM com tool calling consulta um PostgreSQL **só para leitura** e responde com **números conferíveis**, cada um com o SQL que o gerou (dados 100% fictícios).
 
 🇺🇸 [Read in English](README.md)

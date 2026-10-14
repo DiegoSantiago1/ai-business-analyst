@@ -1,5 +1,7 @@
 # AI Business Analyst
 
+[![ci](https://github.com/DiegoSantiago1/ai-business-analyst/actions/workflows/ci.yml/badge.svg)](https://github.com/DiegoSantiago1/ai-business-analyst/actions/workflows/ci.yml)
+
 An AI data analyst for a car dealership network: the manager asks in Portuguese, an LLM with tool calling queries a **read-only** PostgreSQL database and answers with **verifiable numbers**, each one shown with the SQL that produced it (100% fictional data).
 
 🇧🇷 [Leia em português](README.pt-BR.md)
