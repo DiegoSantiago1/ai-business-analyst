@@ -157,7 +157,7 @@ test("detalhada: true chega ao loop (versão do prompt na resposta)", async () =
   const api = await subir(new IAFalsa([RESPONDE_OK()]));
   const r = await api.post({ pergunta: "Quanto vendemos?", detalhada: true });
   assert.equal(r.status, 200);
-  assert.equal((await r.json()).uso.versaoPrompt, "v5.1-detalhada");
+  assert.equal((await r.json()).uso.versaoPrompt, "v6.1-detalhada");
   const invalido = await api.post({ pergunta: "Quanto vendemos?", detalhada: "sim" });
   assert.equal(invalido.status, 400);
   await api.fechar();

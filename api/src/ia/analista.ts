@@ -9,7 +9,7 @@
  *   falhou de novo, ErroRespostaInvalida.
  */
 import type { Contexto, Passo } from "./ferramentas.ts";
-import { executarFerramenta, FERRAMENTAS, resultadoParaModelo } from "./ferramentas.ts";
+import { executarFerramenta, ferramentasDisponiveis, resultadoParaModelo } from "./ferramentas.ts";
 import { montarPromptSistema, versaoDoPrompt } from "./prompt.ts";
 import type { EscolhaFerramenta, Mensagem, ProvedorIA } from "./provedor.ts";
 import {
@@ -44,6 +44,8 @@ export interface ResultadoPergunta {
   limitacoes?: string;
   tabela?: Tabela;
   grafico?: Grafico;
+  /** Seções do manual consultadas (RAG, D28): "documento > seção". */
+  fontes?: string[];
   passos: Passo[];
   uso: {
     modelo: string;
@@ -68,8 +70,10 @@ export async function perguntar(
   { detalhada = false }: { detalhada?: boolean } = {},
 ): Promise<ResultadoPergunta> {
   const inicio = performance.now();
+  const manual = !!contexto.manual;
+  const ferramentas = ferramentasDisponiveis(contexto);
   const mensagens: Mensagem[] = [
-    { role: "system", content: montarPromptSistema(contexto.vocabulario, { detalhada }) },
+    { role: "system", content: montarPromptSistema(contexto.vocabulario, { detalhada, manual }) },
   ];
   for (const troca of historico.slice(-MAX_HISTORICO)) {
     mensagens.push(
@@ -92,7 +96,7 @@ export async function perguntar(
     forcarResposta = false;
     const r = await provedor.completar({
       mensagens,
-      ferramentas: FERRAMENTAS,
+      ferramentas,
       escolha: ultimaChance ? RESPONDER : "required",
       // A resposta detalhada (tópicos + sugestão) é mais longa: mais espaço de saída.
       maxTokensSaida: detalhada ? 1_200 : 800,
@@ -125,13 +129,15 @@ export async function perguntar(
       if (nome === "responder") {
         const final = validarResposta(argumentos, passos);
         if (final.ok) {
+          const fontes = fontesDoManual(passos);
           return {
             pergunta,
             ...final.valor,
+            ...(fontes.length ? { fontes } : {}),
             passos,
             uso: {
               modelo,
-              versaoPrompt: versaoDoPrompt({ detalhada }),
+              versaoPrompt: versaoDoPrompt({ detalhada, manual }),
               voltas: volta,
               tokensEntrada: uso.entrada,
               tokensSaida: uso.saida,
@@ -168,6 +174,14 @@ export async function perguntar(
   throw new ErroRespostaInvalida(
     `A IA não respondeu em ${MAX_VOLTAS} voltas. Ferramentas: ${usadas}.${ultimaFalha ? ` Última falha: ${ultimaFalha}` : ""}`,
   );
+}
+
+/** Seções do manual que voltaram nas consultas desta pergunta, sem repetir. */
+function fontesDoManual(passos: Passo[]): string[] {
+  const fontes = passos
+    .filter((p) => p.ferramenta === "consultar_manual" && !p.erro)
+    .flatMap((p) => (p.linhas ?? []).map((l) => String(l.fonte)));
+  return [...new Set(fontes)];
 }
 
 type Validacao =

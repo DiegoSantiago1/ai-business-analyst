@@ -104,3 +104,37 @@ jobs:
         run: |
           test "$(docker run --rm --entrypoint id ai-business-analyst:ci -u)" = "1000"
           docker run --rm --entrypoint test ai-business-analyst:ci -f /app/web/dist/index.html
+
+  # Serviço de RAG do manual (D28): imagem com o modelo de embeddings, testes dentro dela e
+  # uma busca de verdade contra um PostgreSQL com pgvector (indexa o manual e consulta).
+  rag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      vetores:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_DB: analista_rag
+          POSTGRES_USER: rag
+          POSTGRES_PASSWORD: senha_so_do_ci
+        ports: ["5433:5432"]
+        options: >-
+          --health-cmd "pg_isready -U rag -d analista_rag"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Construir a imagem (baixa o modelo de embeddings)
+        run: docker build -t ai-business-analyst-rag:ci rag
+      - name: Testes do serviço
+        run: >
+          docker run --rm -v "$PWD/manual:/app/manual:ro" -e RAG_MANUAL=/app/manual
+          ai-business-analyst-rag:ci pytest -q -p no:cacheprovider
+      - name: Indexar o manual e medir a busca
+        run: |
+          URL=postgresql+psycopg://rag:senha_so_do_ci@127.0.0.1:5433/analista_rag
+          docker run --rm --network host -v "$PWD/manual:/app/manual:ro" -e RAG_DB_URL=$URL \
+            ai-business-analyst-rag:ci python -m rag_manual.indexar
+          docker run --rm --network host -e RAG_DB_URL=$URL \
+            ai-business-analyst-rag:ci python -m rag_manual.avaliacao_busca | tail -3

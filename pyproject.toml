@@ -37,11 +37,12 @@ select = [
 # assert é o jeito normal de testar no pytest; senhas de teste são fictícias; os testes
 # hostis montam SQL de propósito (S608).
 "tests/**" = ["S101", "S105", "S106", "S608"]
+"rag/tests/**" = ["S101"]
 # Migrations: SQL longo dentro de strings, montado só com texto constante do próprio arquivo.
 "db/migracoes/versions/**" = ["E501", "S608"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["analista"]
+known-first-party = ["analista", "rag_manual"]
 
 # ---------------------------------------------------------------- mypy
 [tool.mypy]

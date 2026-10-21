@@ -1,0 +1,109 @@
+# Avaliação do RAG do manual comercial (D30), 21/10/2026.
+#
+# Cada pergunta tem:
+#   tipo           "manual" (só o manual responde), "manual+banco" (regra do manual + número
+#                  do banco) ou "fora" (o manual NÃO tem a regra: a IA tem de dizer isso);
+#   fonte          seção do manual que tem de ter sido consultada ("documento > seção");
+#   gabarito       a resposta certa, escrita a partir do manual (é o que o juiz compara);
+#   contem / contem_algum / nao_contem   checagens determinísticas (sem acento e sem caixa).
+# O juiz (LLM-as-a-Judge, outro modelo) dá a nota de fidelidade e de correção; as checagens
+# determinísticas servem também para conferir o próprio juiz.
+
+[[pergunta]]
+id = "m01"
+tipo = "manual"
+pergunta = "Quanto cada vendedor recebe de bônus quando a loja passa de 110% da meta?"
+fonte = "Política de metas e bônus > Bônus de equipe"
+gabarito = "R$ 600,00 por vendedor ativo da loja (de 100% a 109,9% da meta são R$ 300,00)."
+contem = ["600"]
+
+[[pergunta]]
+id = "m02"
+tipo = "manual"
+pergunta = "Qual o desconto máximo permitido numa venda financiada?"
+fonte = "Política de descontos > Limites por forma de pagamento"
+gabarito = "Até 3,5%, sem precisar de aprovação do gerente."
+contem = ["3,5"]
+
+[[pergunta]]
+id = "m03"
+tipo = "manual"
+pergunta = "Quem precisa aprovar um desconto de 6% numa venda à vista?"
+fonte = "Política de descontos > Limites por forma de pagamento"
+gabarito = "O gerente da loja: o vendedor aprova até 5% à vista; acima de 5% (até 7%) aprova o gerente."
+contem = ["gerente"]
+
+[[pergunta]]
+id = "m04"
+tipo = "manual"
+pergunta = "Para a meta conta o número de vendas ou o número de unidades?"
+fonte = "Glossário de métricas > Unidades e número de vendas"
+gabarito = "Unidades (veículos vendidos), nunca o número de notas; uma venda pode ter dois veículos."
+contem = ["unidade"]
+
+[[pergunta]]
+id = "m05"
+tipo = "manual"
+pergunta = "Quando começou a campanha de consórcio da rede?"
+fonte = "Formas de pagamento > Consórcio"
+gabarito = "Em janeiro de 2026, com a campanha Consórcio Honda na Rede."
+contem_algum = ["janeiro de 2026", "jan/2026", "01/2026"]
+
+[[pergunta]]
+id = "m06"
+tipo = "manual"
+pergunta = "A meta de uma loja pode ser reduzida se ela estiver vendendo pouco?"
+fonte = "Política de metas e bônus > Revisão de meta"
+gabarito = "Não. A meta só é revisada no meio do ano por evento extraordinário (ex.: falta de estoque por decisão da montadora), com aprovação da diretoria; desempenho fraco não reduz a meta."
+contem = ["nao"]
+
+[[pergunta]]
+id = "m07"
+tipo = "manual"
+pergunta = "Qual a comissão do vendedor na venda de um HR-V?"
+fonte = "Comissão dos vendedores > Comissão por veículo"
+gabarito = "1,2% sobre o valor cobrado, porque o HR-V é SUV (hatch e sedã pagam 1,0%)."
+contem = ["1,2"]
+
+[[pergunta]]
+id = "m08"
+tipo = "manual+banco"
+pergunta = "Quais lojas ganharam bônus de equipe em setembro de 2026, e de quanto por vendedor?"
+fonte = "Política de metas e bônus > Bônus de equipe"
+# Gabarito corrigido em 21/10/2026 depois da 1ª rodada: a versão anterior dizia "Serra com
+# cerca de 112%" (o banco diz 110,8%) e "Litoral com cerca de 71%" (72,1%). A nota já medida
+# não foi refeita.
+gabarito = "Loja Serra (110,8% da meta) ganhou R$ 600,00 por vendedor; Loja Centro (108,1%) e Loja Norte (103,1%) ganharam R$ 300,00. Loja Sul (96,3%) e Loja Litoral (72,1%) ficaram sem bônus."
+contem = ["serra", "600", "centro", "norte", "300"]
+
+[[pergunta]]
+id = "m09"
+tipo = "manual+banco"
+pergunta = "A Loja Litoral precisa apresentar plano de ação à diretoria?"
+fonte = "Política de metas e bônus > Plano de ação"
+# Números conferidos no banco em 21/10/2026 (a 1ª versão dizia 78%, 75% e 71%).
+gabarito = "Sim: ficou três meses seguidos abaixo de 90% da meta (julho, agosto e setembro de 2026: 79,1%, 75,6% e 72,1%), e a política exige plano de ação em até 15 dias nesse caso."
+contem = ["sim"]
+contem_algum = ["90%", "90 %", "tres meses", "3 meses"]
+
+[[pergunta]]
+id = "m10"
+tipo = "manual+banco"
+pergunta = "Por que dezembro é o mês em que mais vendemos?"
+fonte = "Calendário comercial > Dezembro: o maior mês do ano"
+gabarito = "Pelo calendário comercial: a campanha Fim de Ano Honda, com condições especiais de financiamento, as entregas de Natal e o 13º salário; dezembro é sempre o maior mês de cada ano."
+contem_algum = ["fim de ano", "13"]
+
+[[pergunta]]
+id = "m11"
+tipo = "fora"
+pergunta = "Qual é a política de férias dos vendedores?"
+gabarito = "O manual não tem regra sobre férias: a IA deve dizer que não encontrou essa política, sem inventar."
+nao_contem = ["30 dias"]
+
+[[pergunta]]
+id = "m12"
+tipo = "fora"
+pergunta = "Quanto a rede paga de comissão ao gerente da loja?"
+gabarito = "O manual só define a comissão dos vendedores (1,0% e 1,2%); não há regra de comissão de gerente. A IA deve dizer isso, sem inventar."
+nao_contem = []

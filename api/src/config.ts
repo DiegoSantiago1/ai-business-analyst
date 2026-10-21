@@ -172,3 +172,20 @@ export function carregarConfigServidor(env: Ambiente = lerAmbiente()): ConfigSer
     limitePorMinuto: v.LIMITE_POR_MINUTO,
   };
 }
+
+// --------------------------------------------------------------------------- RAG do manual (D28)
+
+const esquemaManual = z.object({
+  // Vazio ou ausente = sem RAG: a ferramenta consultar_manual não é oferecida ao modelo.
+  RAG_URL: z.preprocess(
+    (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+    z.url({ protocol: /^https?$/ }).optional(),
+  ),
+});
+
+/** URL do serviço de RAG, ou undefined se não configurado. */
+export function carregarUrlManual(env: Ambiente = lerAmbiente()): string | undefined {
+  const resultado = esquemaManual.safeParse(env);
+  if (!resultado.success) throw erroDeValidacao(resultado.error);
+  return resultado.data.RAG_URL;
+}

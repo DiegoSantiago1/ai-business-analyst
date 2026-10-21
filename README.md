@@ -61,6 +61,23 @@ The remaining 4 questions, and the 4 that failed, ran again on `gpt-oss-20b` wit
 - **Free-tier protections:** 4 questions per minute per visitor, one question at a time, a daily budget per model, a **fallback model** (when `gpt-oss-120b` runs out, `gpt-oss-20b` answers, doubling the daily questions) and a "waking up the server" notice for cold starts.
 - **Detailed answers** (default in the UI, optional in the API): the direct answer in bold, 2–4 context bullets and a suggested next question. Measured before adopting: the first version scored 3/8 on `gpt-oss-20b` (the model returned only the bold line); the fixed one (v5.1) scored 8/8 on the same questions and 6/6 on questions not used for tuning, at ~30% more tokens. Details in [DECISOES.md](docs/DECISOES.md) (D27).
 
+## Ask the sales manual (RAG)
+
+Some questions are not in the database: "how much bonus does each salesperson get above 110% of target?", "who approves a 6% discount?". A fictional **sales manual** (`manual/`, 9 documents written to match the data) answers them through a new tool, `consultar_manual`, and the agent can combine a rule with a number ("which stores earned the team bonus in September?").
+
+```
+question ─► Node API (tool calling) ──consultar_manual──► FastAPI RAG service (rag/, Python 3.13)
+                                                            ├─ embeddings: local multilingual model (fastembed, free)
+                                                            └─ PostgreSQL + pgvector: vector search + Portuguese full-text,
+                                                               fused by Reciprocal Rank Fusion (one SQL query)
+```
+
+- **LangChain** for chunking (by heading, then by size), the `Embeddings` interface and `PGVector`; 48 chunks, indexed in ~16 s.
+- **Retrieval measured** on 26 questions: hit@3 **95%**, MRR **0.825** (hybrid), against 0.800 vector-only. A bigger embedding model (768 dims) did **worse** (MRR 0.754) and indexed 10× slower.
+- **Answers judged by an LLM (LLM-as-a-Judge):** a model from another family (Qwen) grades faithfulness and correctness against a written answer key. Before trusting it, the judge must approve the answer keys and fail answers that are wrong on purpose: **11/11**. Result on 12 questions (gpt-oss-120b): **12/12 faithful** (nothing invented), **10/12** fully correct, 7/7 manual-only, 2/2 "the manual does not cover this".
+- The evaluation caught a prompt conflict (a "data does not exist" rule beat the "ask the manual" rule) and **errors in my own answer key**; all in [DECISOES.md](docs/DECISOES.md) (D28–D30).
+- Runs locally (`docker compose up -d`); the free cloud demo stays without RAG (512 MB plan).
+
 ## How it works
 
 ```mermaid
@@ -111,15 +128,25 @@ cd api; npm ci; npm start                     # http://127.0.0.1:3335
 
 Evaluation (with the API running): `.venv\Scripts\python -m analista.avaliacao`.
 
+Sales-manual RAG (optional; set `RAG_DB_PASSWORD` and `RAG_URL` in `.env`):
+
+```powershell
+docker compose up -d                                       # pgvector + RAG service (127.0.0.1 only)
+docker compose run --rm rag python -m rag_manual.indexar   # index manual/
+docker compose run --rm rag python -m rag_manual.avaliacao_busca   # retrieval metrics
+.venv\Scripts\python -m analista.avaliacao_manual          # answers + LLM judge (API running)
+```
+
 ## Tests
 
-384 automated tests: 196 in Python (database rules, permissions, planted patterns, evaluator, remote bootstrap), 179 in the API (metrics, security layers, tool-calling loop with a fake AI, Groq client, fallback model, HTTP) and 9 in the UI. CI (GitHub Actions) runs lint, types, tests and build on a real PostgreSQL, and builds the Docker image.
+426 automated tests: 213 in Python (database rules, permissions, planted patterns, evaluators, remote bootstrap), 191 in the API (metrics, security layers, tool-calling loop with a fake AI, Groq client, fallback model, sales-manual tool, HTTP), 9 in the UI and 13 in the RAG service (chunking, API contract, relevance filter). CI (GitHub Actions) runs lint, types, tests and build on a real PostgreSQL, builds the Docker image, and builds the RAG image to index the manual and measure retrieval against a real pgvector.
 
 ## Limitations
 
 - Groq free tier: ~1 question per minute and ~40 per day per model. The live chat answers one question at a time, limits each visitor and falls back to a backup model; when the daily quota runs out, it says so and points to the recorded conversations.
 - 36 questions show regressions and behavior, not robust statistics; automatic checking can be wrong both ways (all answers are published).
 - Fictional, small dataset: good for planted patterns, not for business conclusions.
+- RAG: 12 judged questions and 26 retrieval questions show behavior, not statistics. Known misses: "can the target be lowered?" does not retrieve the right section, and "why is December the best month?" was answered without asking the manual.
 
 ## Author
 

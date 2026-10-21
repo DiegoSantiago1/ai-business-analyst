@@ -4,6 +4,8 @@
  * - consultar_metrica: caminho principal, métricas oficiais (D5);
  * - descrever_tabelas: colunas e descrições das views do schema ia (lidas do banco);
  * - executar_sql: reserva para o que o catálogo não cobre, atrás das travas (D6);
+ * - consultar_manual: políticas e definições do manual comercial, pelo RAG (D28; só existe
+ *   se o serviço estiver configurado);
  * - responder: a resposta final, estruturada (validada em resposta.ts).
  *
  * Os esquemas JSON são escritos à mão, curtos: eles vão ao modelo em TODA volta, e cada
@@ -19,6 +21,7 @@ import {
   NOMES_METRICAS,
 } from "../metricas.ts";
 import type { Vocabulario } from "../vocabulario.ts";
+import type { ClienteManual } from "./manual.ts";
 import type { DefinicaoFerramenta } from "./provedor.ts";
 import { MAX_LINHAS, prepararSqlLivre } from "./sql-livre.ts";
 
@@ -85,6 +88,20 @@ export const FERRAMENTAS: DefinicaoFerramenta[] = [
   {
     type: "function",
     function: {
+      name: "consultar_manual",
+      description:
+        "Busca no manual comercial da rede: regras de metas e bônus, descontos, comissão, formas de pagamento, calendário, lojas e definições das métricas.",
+      parameters: {
+        type: "object",
+        additionalProperties: false,
+        required: ["pergunta"],
+        properties: { pergunta: { type: "string", description: "A dúvida, em português" } },
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
       name: "responder",
       description: "Resposta final ao gerente. Chame sempre no fim.",
       parameters: {
@@ -128,6 +145,13 @@ export const FERRAMENTAS: DefinicaoFerramenta[] = [
   },
 ];
 
+/** As ferramentas que o modelo vê nesta pergunta: sem manual configurado, sem consultar_manual. */
+export function ferramentasDisponiveis(contexto: Pick<Contexto, "manual">): DefinicaoFerramenta[] {
+  return contexto.manual
+    ? FERRAMENTAS
+    : FERRAMENTAS.filter((f) => f.function.name !== "consultar_manual");
+}
+
 // --------------------------------------------------------------------------- execução
 
 export interface Passo {
@@ -147,6 +171,8 @@ export interface Passo {
 export interface Contexto {
   pool: pg.Pool;
   vocabulario: Vocabulario;
+  /** RAG do manual (D28). Sem ele, a ferramenta consultar_manual não é oferecida. */
+  manual?: ClienteManual;
   /** Cache da descrição das views (muda só com migration). */
   descricaoTabelas?: string;
 }
@@ -240,6 +266,25 @@ export async function executarFerramenta(
       const r = await consultarSomenteLeitura(contexto.pool, sql);
       return comoPasso(nome, argumentos, sql, [], r);
     }
+    if (nome === "consultar_manual") {
+      if (!contexto.manual) throw new ErroFerramenta("O manual não está disponível.");
+      const pergunta = typeof args.pergunta === "string" ? args.pergunta.trim() : "";
+      if (pergunta.length < 3 || pergunta.length > 500) {
+        throw new ErroFerramenta("Informe a dúvida em pergunta (3 a 500 caracteres).");
+      }
+      const r = await contexto.manual.buscar(pergunta);
+      return {
+        ferramenta: nome,
+        argumentos,
+        linhas: r.trechos.map((t) => ({
+          fonte: `${t.documento} > ${t.secao}`,
+          arquivo: t.arquivo,
+          texto: t.texto,
+        })),
+        totalLinhas: r.trechos.length,
+        duracaoMs: duracao(),
+      };
+    }
     if (nome === "descrever_tabelas") {
       const texto = await descreverTabelas(contexto);
       return { ferramenta: nome, argumentos, linhas: [{ descricao: texto }], duracaoMs: duracao() };
@@ -255,6 +300,17 @@ export async function executarFerramenta(
 export function resultadoParaModelo(passo: Passo): string {
   if (passo.erro) return JSON.stringify({ erro: passo.erro });
   if (passo.ferramenta === "descrever_tabelas") return String(passo.linhas?.[0]?.descricao ?? "");
+  if (passo.ferramenta === "consultar_manual") {
+    const trechos = (passo.linhas ?? []).map((l) => ({ fonte: l.fonte, texto: l.texto }));
+    return JSON.stringify(
+      trechos.length
+        ? { trechos }
+        : {
+            trechos,
+            aviso: "O manual não tem nada sobre isso: diga que a regra não está no manual.",
+          },
+    );
+  }
   const colunas = passo.colunas ?? [];
   const linhas = (passo.linhas ?? [])
     .slice(0, LINHAS_PARA_O_MODELO)

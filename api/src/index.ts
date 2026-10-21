@@ -9,9 +9,11 @@ import {
   carregarConfigBanco,
   carregarConfigIA,
   carregarConfigServidor,
+  carregarUrlManual,
   lerAmbiente,
 } from "./config.ts";
 import { ClienteGroq } from "./ia/groq.ts";
+import { ClienteManualHttp } from "./ia/manual.ts";
 import type { ProvedorIA } from "./ia/provedor.ts";
 import { ProvedorComReserva } from "./ia/reserva.ts";
 import { criarApp } from "./servidor/app.ts";
@@ -54,9 +56,13 @@ const vocabulario = await carregarVocabulario(pool).catch(async (erro: unknown) 
   process.exit(1);
 });
 
+// RAG do manual (D28): só com RAG_URL. Na nuvem gratuita fica desligado (D28).
+const urlManual = carregarUrlManual(env);
+const manual = urlManual ? new ClienteManualHttp(urlManual) : undefined;
+
 const app = criarApp({
   provedor,
-  contexto: { pool, vocabulario },
+  contexto: { pool, vocabulario, ...(manual ? { manual } : {}) },
   limitePorIp: new LimitePorIp(servidorConfig.limitePorMinuto),
   orcamento,
   modelos,
@@ -68,7 +74,7 @@ if (servidorConfig.confiarNoProxy) app.set("trust proxy", 1);
 
 const servidor = app.listen(servidorConfig.porta, servidorConfig.host, () => {
   console.log(
-    `API em http://${servidorConfig.host}:${servidorConfig.porta} (modelos: ${modelos.join(" -> ")})`,
+    `API em http://${servidorConfig.host}:${servidorConfig.porta} (modelos: ${modelos.join(" -> ")}; manual: ${urlManual ?? "desligado"})`,
   );
 });
 

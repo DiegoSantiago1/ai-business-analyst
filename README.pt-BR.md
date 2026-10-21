@@ -61,6 +61,23 @@ As 4 perguntas restantes e as 4 que falharam rodaram de novo no `gpt-oss-20b` co
 - **Proteções do plano gratuito:** 4 perguntas por minuto por visitante, uma pergunta por vez, orçamento diário por modelo, **modelo reserva** (quando o `gpt-oss-120b` esgota, o `gpt-oss-20b` responde, dobrando as perguntas por dia) e o aviso "acordando o servidor" quando a hospedagem estava dormindo.
 - **Respostas detalhadas** (padrão na interface, opcional na API): a resposta direta em negrito, 2 a 4 tópicos de contexto e uma sugestão de próxima pergunta. Medidas antes de adotar: a primeira versão acertou 3 de 8 no `gpt-oss-20b` (o modelo devolvia só a linha em negrito); a corrigida (v5.1) acertou 8 de 8 nas mesmas perguntas e 6 de 6 em perguntas que não foram usadas no ajuste, com ~30% mais tokens. Detalhes em [DECISOES.md](docs/DECISOES.md) (D27).
 
+## Pergunte ao manual comercial (RAG)
+
+Algumas perguntas não estão no banco: "quanto cada vendedor ganha de bônus acima de 110% da meta?", "quem aprova um desconto de 6%?". Um **manual comercial** fictício (`manual/`, 9 documentos escritos coerentes com os dados) responde por uma ferramenta nova, `consultar_manual`, e o agente pode juntar regra e número ("quais lojas ganharam o bônus de equipe em setembro?").
+
+```
+pergunta ─► API Node (tool calling) ──consultar_manual──► serviço de RAG em FastAPI (rag/, Python 3.13)
+                                                            ├─ embeddings: modelo multilíngue local (fastembed, grátis)
+                                                            └─ PostgreSQL + pgvector: busca vetorial + full-text em português,
+                                                               fundidas por Reciprocal Rank Fusion (uma consulta SQL)
+```
+
+- **LangChain** no corte dos documentos (por título, depois por tamanho), na interface `Embeddings` e no `PGVector`; 48 trechos, indexados em ~16 s.
+- **Busca medida** em 26 perguntas: acerto@3 de **95%** e MRR de **0,825** (híbrida), contra 0,800 só com vetores. Um modelo de embeddings maior (768 dimensões) foi **pior** (MRR 0,754) e indexou 10× mais devagar.
+- **Respostas avaliadas por um LLM (LLM-as-a-Judge):** um modelo de outra família (Qwen) dá nota de fidelidade e de correção contra um gabarito escrito. Antes de confiar nele, o juiz tem de aprovar os gabaritos e reprovar respostas erradas de propósito: **11/11**. Resultado em 12 perguntas (gpt-oss-120b): **12/12 fiéis** (nada inventado), **10/12** totalmente corretas, 7/7 só com o manual e 2/2 "o manual não tem essa regra".
+- A avaliação pegou um conflito no prompt (a regra "dado inexistente" vencia a regra "consulte o manual") e **erros no meu próprio gabarito**; tudo em [DECISOES.md](docs/DECISOES.md) (D28–D30).
+- Roda localmente (`docker compose up -d`); a demonstração gratuita na nuvem segue sem RAG (plano de 512 MB).
+
 ## Como funciona
 
 ```mermaid
@@ -111,15 +128,25 @@ cd api; npm ci; npm start                     # http://127.0.0.1:3335
 
 Avaliação (com a API rodando): `.venv\Scripts\python -m analista.avaliacao`.
 
+RAG do manual comercial (opcional; defina `RAG_DB_PASSWORD` e `RAG_URL` no `.env`):
+
+```powershell
+docker compose up -d                                       # pgvector + serviço de RAG (só 127.0.0.1)
+docker compose run --rm rag python -m rag_manual.indexar   # indexa manual/
+docker compose run --rm rag python -m rag_manual.avaliacao_busca   # métricas da busca
+.venv\Scripts\python -m analista.avaliacao_manual          # respostas + juiz (com a API rodando)
+```
+
 ## Testes
 
-384 testes automatizados: 196 em Python (regras do banco, permissões, padrões plantados, avaliador, bootstrap remoto), 179 na API (métricas, camadas de segurança, loop de ferramentas com IA falsa, cliente do Groq, modelo reserva, HTTP) e 9 na interface. O CI (GitHub Actions) roda lint, tipos, testes e build com um PostgreSQL de verdade, e constrói a imagem Docker.
+426 testes automatizados: 213 em Python (regras do banco, permissões, padrões plantados, avaliadores, bootstrap remoto), 191 na API (métricas, camadas de segurança, loop de ferramentas com IA falsa, cliente do Groq, modelo reserva, ferramenta do manual, HTTP), 9 na interface e 13 no serviço de RAG (corte dos documentos, contrato da API, filtro de relevância). O CI (GitHub Actions) roda lint, tipos, testes e build com um PostgreSQL de verdade, constrói a imagem Docker e constrói a imagem do RAG para indexar o manual e medir a busca contra um pgvector de verdade.
 
 ## Limitações
 
 - Plano gratuito do Groq: ~1 pergunta por minuto e ~40 por dia por modelo. O chat ao vivo responde uma pergunta por vez, limita cada visitante e passa para um modelo reserva; quando a cota do dia acaba, ele avisa e aponta para as conversas gravadas.
 - 36 perguntas mostram regressão e comportamento, não estatística robusta; a conferência automática pode errar nos dois sentidos (todas as respostas estão publicadas).
 - Dados fictícios e pequenos: bons para padrões plantados, não para conclusões de negócio.
+- RAG: 12 perguntas julgadas e 26 de busca mostram comportamento, não estatística. Falhas conhecidas: "a meta pode ser reduzida?" não traz a seção certa, e "por que dezembro vende mais?" foi respondida sem consultar o manual.
 
 ## Autor
 

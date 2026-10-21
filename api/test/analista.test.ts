@@ -196,7 +196,7 @@ describe("perguntar", () => {
     assert.match(texto, /máximo UMA consulta extra/i);
     assert.match(texto, /Exemplo de resposta/);
     assert.equal(ia.pedidos[0]?.maxTokensSaida, 1200);
-    assert.equal(r.uso.versaoPrompt, "v5.1-detalhada");
+    assert.equal(r.uso.versaoPrompt, "v6.1-detalhada");
   });
 
   test("modo curto (padrão): regra de 1 a 4 frases", async () => {
@@ -207,6 +207,6 @@ describe("perguntar", () => {
     assert.match(texto, /1 a 4 frases/);
     assert.doesNotMatch(texto, /Sugestão:/);
     assert.equal(ia.pedidos[0]?.maxTokensSaida, 800);
-    assert.equal(r.uso.versaoPrompt, "v5.1-curta");
+    assert.equal(r.uso.versaoPrompt, "v6.1-curta");
   });
 });

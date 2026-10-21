@@ -1,0 +1,45 @@
+# RAG do manual comercial (D28): um PostgreSQL com pgvector só para os vetores e o serviço
+# FastAPI que a API Node chama. O banco de vendas continua no container compartilhado.
+#
+#   docker compose up -d                       # sobe os dois (portas só no 127.0.0.1)
+#   docker compose run --rm rag python -m rag_manual.indexar
+#   docker compose run --rm rag pytest -q
+#
+# A senha vem de RAG_DB_PASSWORD no .env (o .env não vai para o git).
+services:
+  vetores:
+    image: pgvector/pgvector:pg16
+    container_name: analista-vetores
+    environment:
+      POSTGRES_DB: analista_rag
+      POSTGRES_USER: rag
+      POSTGRES_PASSWORD: ${RAG_DB_PASSWORD:?defina RAG_DB_PASSWORD no .env}
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - vetores:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rag -d analista_rag"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  rag:
+    build: rag
+    image: ai-business-analyst-rag:local
+    environment:
+      RAG_DB_URL: postgresql+psycopg://rag:${RAG_DB_PASSWORD}@vetores:5432/analista_rag
+      RAG_MANUAL: /app/manual
+    volumes:
+      - ./manual:/app/manual:ro
+      # Código e testes montados: editar e rodar sem reconstruir a imagem.
+      - ./rag/src:/app/src:ro
+      - ./rag/tests:/app/tests:ro
+    ports:
+      - "127.0.0.1:8001:8001"
+    depends_on:
+      vetores:
+        condition: service_healthy
+
+volumes:
+  vetores:

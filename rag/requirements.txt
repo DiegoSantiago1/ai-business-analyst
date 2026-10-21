@@ -1,0 +1,12 @@
+# Serviço de RAG do manual comercial (D28): FastAPI + LangChain + pgvector + embeddings locais.
+# Python 3.13 (container): o onnxruntime das embeddings não depende do Python 3.14 do resto.
+fastapi==0.142.2
+uvicorn==0.54.0
+langchain-core==1.6.6
+langchain-text-splitters==1.1.3
+langchain-postgres==0.0.18
+fastembed==0.8.1
+psycopg[binary]==3.3.6
+# testes
+pytest==9.1.1
+httpx==0.28.1

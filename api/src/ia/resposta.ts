@@ -1,8 +1,8 @@
 /**
  * Resposta final (structured output): validação com zod e conferência dos números.
  *
- * Conferência: cada número que a IA cita é procurado nos resultados que o banco devolveu
- * nesta pergunta. Achou (com tolerância de arredondamento) = "conferido". Não achou = a
+ * Conferência: cada número que a IA cita é procurado nos resultados que o banco (ou o
+ * manual, D28) devolveu nesta pergunta. Achou (com tolerância de arredondamento) = "conferido". Não achou = a
  * IA calculou (ex.: variação entre dois meses) ou inventou; a interface mostra isso, para o
  * gerente não confiar de olhos fechados. A avaliação (fase 7) mede essa taxa.
  */
@@ -109,10 +109,25 @@ export interface Grafico {
   y: string;
 }
 
+/** Números citados num texto ("110%", "R$ 600,00", "3,5%"...): os trechos do manual. */
+export function numerosDoTexto(texto: string): number[] {
+  const numeros: number[] = [];
+  for (const m of texto.matchAll(/\d[\d.,]*/g)) {
+    const n = numeroDeTexto(m[0].replace(/[.,]$/, ""));
+    if (n !== undefined) numeros.push(n);
+  }
+  return numeros;
+}
+
 export function numerosDosResultados(passos: Passo[]): number[] {
   const numeros: number[] = [];
   for (const passo of passos) {
     if (passo.erro) continue;
+    if (passo.ferramenta === "consultar_manual") {
+      // O manual devolve texto: os números citados nele também vieram de uma ferramenta.
+      for (const linha of passo.linhas ?? []) numeros.push(...numerosDoTexto(String(linha.texto)));
+      continue;
+    }
     for (const linha of passo.linhas ?? []) {
       for (const valor of Object.values(linha)) {
         if (typeof valor === "number" && Number.isFinite(valor)) numeros.push(valor);

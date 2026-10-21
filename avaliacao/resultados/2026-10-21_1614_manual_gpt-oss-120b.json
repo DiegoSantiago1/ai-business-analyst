@@ -1,0 +1,551 @@
+{
+ "quando": "2026-10-21T19:14:33+00:00",
+ "juiz": "qwen/qwen3.8-27b",
+ "controle_do_juiz": {
+  "acertos": 11,
+  "total": 11,
+  "confiavel": true,
+  "casos": [
+   {
+    "caso": "m01: o próprio gabarito",
+    "esperado": true,
+    "nota": {
+     "fiel": true,
+     "correta": 2,
+     "justificativa": "A resposta é idêntica ao gabarito e ao trecho consultado no manual."
+    },
+    "ok": true
+   },
+   {
+    "caso": "m02: o próprio gabarito",
+    "esperado": true,
+    "nota": {
+     "fiel": true,
+     "correta": 2,
+     "justificativa": "A resposta é idêntica ao gabarito e ao trecho consultado no manual."
+    },
+    "ok": true
+   },
+   {
+    "caso": "m03: o próprio gabarito",
+    "esperado": true,
+    "nota": {
+     "fiel": true,
+     "correta": 2,
+     "justificativa": "A resposta é idêntica ao gabarito e ao trecho consultado, respondendo corretamente que o gerente aprova descontos acima de 5%."
+    },
+    "ok": true
+   },
+   {
+    "caso": "m04: o próprio gabarito",
+    "esperado": true,
+    "nota": {
+     "fiel": true,
+     "correta": 2,
+     "justificativa": "A resposta é idêntica ao gabarito e ao trecho consultado, respondendo corretamente à pergunta."
+    },
+    "ok": true
+   },
+   {
+    "caso": "m05: o próprio gabarito",
+    "esperado": true,
+    "nota": {
+     "fiel": true,
+     "correta": 2,
+     "justificativa": "A resposta é idêntica ao gabarito e ao trecho consultado no manual."
+    },
+    "ok": true
+   },
+   {
+    "caso": "m06: o próprio gabarito",
+    "esperado": true,
+    "nota": {
+     "fiel": true,
+     "correta": 2,
+     "justificativa": "A resposta é idêntica ao gabarito e ao trecho consultado, respondendo corretamente à pergunta."
+    },
+    "ok": true
+   },
+   {
+    "caso": "m07: o próprio gabarito",
+    "esperado": true,
+    "nota": {
+     "fiel": true,
+     "correta": 2,
+     "justificativa": "A resposta é idêntica ao gabarito e ao trecho consultado, contendo a porcentagem correta e a justificativa adequada."
+    },
+    "ok": true
+   },
+   {
+    "caso": "m01: resposta errada de propósito",
+    "esperado": false,
+    "nota": {
+     "fiel": false,
+     "correta": 0,
+     "justificativa": "A resposta afirma um valor de R$ 900,00, enquanto o manual e o gabarito indicam claramente R$ 600,00."
+    },
+    "ok": true
+   },
+   {
+    "caso": "m02: resposta errada de propósito",
+    "esperado": false,
+    "nota": {
+     "fiel": false,
+     "correta": 0,
+     "justificativa": "A resposta inventa um valor (7%) e uma condição de aprovação (vendedor) que não existem no manual consultado, contradizendo o gabarito."
+    },
+    "ok": true
+   },
+   {
+    "caso": "m06: resposta errada de propósito",
+    "esperado": false,
+    "nota": {
+     "fiel": false,
+     "correta": 0,
+     "justificativa": "A resposta contradiz o manual e o gabarito, afirmando que a meta é reduzida por baixo desempenho, quando a regra estabelece que apenas eventos extraordinários com aprovação da diretoria permitem revisão."
+    },
+    "ok": true
+   },
+   {
+    "caso": "m07: resposta errada de propósito",
+    "esperado": false,
+    "nota": {
+     "fiel": false,
+     "correta": 0,
+     "justificativa": "A resposta inventa um valor (2,5%) e uma base de cálculo (preço de tabela) que não existem no manual, contradizendo o gabarito que afirma ser 1,2% sobre o valor cobrado."
+    },
+    "ok": true
+   }
+  ]
+ },
+ "itens": [
+  {
+   "id": "m01",
+   "tipo": "manual",
+   "pergunta": "Quanto cada vendedor recebe de bônus quando a loja passa de 110% da meta?",
+   "resposta": "Segundo a Política de metas e bônus, quando a loja atinge 110% ou mais da meta, cada vendedor ativo recebe um bônus de R$ 600,00.",
+   "fontes": [
+    "Política de metas e bônus > Bônus de equipe",
+    "Glossário de métricas > Meta e atingimento",
+    "Política de metas e bônus > Como a meta é definida",
+    "Política de descontos > Limites por forma de pagamento"
+   ],
+   "ferramentas": [
+    "consultar_manual"
+   ],
+   "consultas_manual": [
+    {
+     "pergunta": "qual é o valor do bônus que cada vendedor recebe quando a loja atinge 110% da meta",
+     "trechos": 4,
+     "erro": null
+    }
+   ],
+   "erros_ferramentas": [],
+   "checagem": {
+    "fonte_consultada": true,
+    "palavras_ok": true,
+    "faltando": []
+   },
+   "nota": {
+    "fiel": true,
+    "correta": 2,
+    "justificativa": "A resposta informa corretamente o valor de R$ 600,00 para vendedores ativos quando a meta é atingida em 110% ou mais, conforme o manual consultado e o gabarito."
+   },
+   "tokens": 5539,
+   "latencia_ms": 10168
+  },
+  {
+   "id": "m02",
+   "tipo": "manual",
+   "pergunta": "Qual o desconto máximo permitido numa venda financiada?",
+   "resposta": "O desconto máximo permitido numa venda financiada é de 3,5 %.",
+   "fontes": [
+    "Política de descontos > Desconto acima do limite",
+    "Política de descontos > Limites por forma de pagamento",
+    "Glossário de métricas > Desconto médio (%)",
+    "Política de descontos > Por que o à vista tem o maior desconto"
+   ],
+   "ferramentas": [
+    "consultar_manual"
+   ],
+   "consultas_manual": [
+    {
+     "pergunta": "Qual o desconto máximo permitido numa venda financiada?",
+     "trechos": 4,
+     "erro": null
+    }
+   ],
+   "erros_ferramentas": [],
+   "checagem": {
+    "fonte_consultada": true,
+    "palavras_ok": true,
+    "faltando": []
+   },
+   "nota": {
+    "fiel": true,
+    "correta": 2,
+    "justificativa": "A resposta identifica corretamente o limite de 3,5% para vendas financiadas, conforme a tabela de limites e a regra do sistema no manual consultado."
+   },
+   "tokens": 8056,
+   "latencia_ms": 39346
+  },
+  {
+   "id": "m03",
+   "tipo": "manual",
+   "pergunta": "Quem precisa aprovar um desconto de 6% numa venda à vista?",
+   "resposta": "Descontos à vista entre 3% e 7% podem ser concedidos pelo vendedor até 5%; acima de 5% (como 6%) precisam ser aprovados pelo gerente da loja, conforme a Política de descontos > Limites por forma de pagamento.",
+   "fontes": [
+    "Política de descontos > Desconto acima do limite",
+    "Política de descontos > Por que o à vista tem o maior desconto",
+    "Política de descontos > Limites por forma de pagamento",
+    "Glossário de métricas > Desconto médio (%)"
+   ],
+   "ferramentas": [
+    "consultar_manual"
+   ],
+   "consultas_manual": [
+    {
+     "pergunta": "Quem precisa aprovar um desconto de 6% numa venda à vista?",
+     "trechos": 4,
+     "erro": null
+    }
+   ],
+   "erros_ferramentas": [],
+   "checagem": {
+    "fonte_consultada": true,
+    "palavras_ok": true,
+    "faltando": []
+   },
+   "nota": {
+    "fiel": true,
+    "correta": 2,
+    "justificativa": "A resposta identifica corretamente o gerente da loja como o aprovador para descontos acima de 5% à vista, baseando-se fielmente na tabela consultada."
+   },
+   "tokens": 5350,
+   "latencia_ms": 33887
+  },
+  {
+   "id": "m04",
+   "tipo": "manual",
+   "pergunta": "Para a meta conta o número de vendas ou o número de unidades?",
+   "resposta": "A meta é medida em unidades vendidas, ou seja, conta‑se o número de veículos entregues, não o número de notas de venda. (Fonte: Glossário de métricas e Política de metas e bônus)",
+   "fontes": [
+    "Glossário de métricas > Unidades e número de vendas",
+    "Política de metas e bônus > Como a meta é definida",
+    "Glossário de métricas > Meta e atingimento",
+    "Glossário de métricas > Desconto médio (%)"
+   ],
+   "ferramentas": [
+    "consultar_manual"
+   ],
+   "consultas_manual": [
+    {
+     "pergunta": "Para a meta conta o número de vendas ou o número de unidades?",
+     "trechos": 4,
+     "erro": null
+    }
+   ],
+   "erros_ferramentas": [],
+   "checagem": {
+    "fonte_consultada": true,
+    "palavras_ok": true,
+    "faltando": []
+   },
+   "nota": {
+    "fiel": true,
+    "correta": 2,
+    "justificativa": "A resposta está fiel ao manual consultado e responde corretamente que a meta é medida em unidades (veículos) e não em número de vendas (notas)."
+   },
+   "tokens": 8378,
+   "latencia_ms": 43335
+  },
+  {
+   "id": "m05",
+   "tipo": "manual",
+   "pergunta": "Quando começou a campanha de consórcio da rede?",
+   "resposta": "A campanha de consórcio da rede foi lançada em janeiro de 2026.",
+   "fontes": [
+    "Formas de pagamento > Consórcio",
+    "Calendário comercial > Campanhas de 2026",
+    "Política de metas e bônus > Como a meta é definida",
+    "Calendário comercial > Novembro: aquecimento"
+   ],
+   "ferramentas": [
+    "consultar_manual"
+   ],
+   "consultas_manual": [
+    {
+     "pergunta": "Quando começou a campanha de consórcio da rede?",
+     "trechos": 4,
+     "erro": null
+    }
+   ],
+   "erros_ferramentas": [],
+   "checagem": {
+    "fonte_consultada": true,
+    "palavras_ok": true,
+    "faltando": []
+   },
+   "nota": {
+    "fiel": true,
+    "correta": 2,
+    "justificativa": "A resposta identifica corretamente o mês e o ano de lançamento da campanha, conforme descrito no manual consultado e no gabarito."
+   },
+   "tokens": 8273,
+   "latencia_ms": 58358
+  },
+  {
+   "id": "m06",
+   "tipo": "manual",
+   "pergunta": "A meta de uma loja pode ser reduzida se ela estiver vendendo pouco?",
+   "resposta": "A meta de cada loja é definida pela diretoria comercial anualmente e distribuída pelos meses segundo a sazonalidade histórica; não há previsão de redução da meta por baixo desempenho de vendas. Quando a loja fica três meses consecutivos abaixo de 90 % da meta, o gerente deve apresentar um plano de ação, mas a meta em si permanece a mesma.",
+   "fontes": [
+    "Política de metas e bônus > Como a meta é definida",
+    "Política de metas e bônus > Plano de ação",
+    "Lojas da rede > Loja Serra (Caruaru)",
+    "Política de metas e bônus > Bônus de equipe"
+   ],
+   "ferramentas": [
+    "consultar_manual"
+   ],
+   "consultas_manual": [
+    {
+     "pergunta": "A meta de uma loja pode ser reduzida se ela estiver vendendo pouco?",
+     "trechos": 4,
+     "erro": null
+    }
+   ],
+   "erros_ferramentas": [],
+   "checagem": {
+    "fonte_consultada": false,
+    "palavras_ok": true,
+    "faltando": []
+   },
+   "nota": {
+    "fiel": true,
+    "correta": 2,
+    "justificativa": "A resposta confirma corretamente que a meta não é reduzida por baixo desempenho, alinhando-se ao gabarito e aos trechos consultados sobre a definição anual e o plano de ação."
+   },
+   "tokens": 8604,
+   "latencia_ms": 30081
+  },
+  {
+   "id": "m07",
+   "tipo": "manual",
+   "pergunta": "Qual a comissão do vendedor na venda de um HR-V?",
+   "resposta": "A comissão do vendedor na venda de um HR‑V (categoria SUV) é de 1,2 % sobre o valor cobrado, conforme a política de comissão da rede.",
+   "fontes": [
+    "Comissão dos vendedores > Comissão por veículo",
+    "Comissão dos vendedores > Pagamento",
+    "Comissão dos vendedores > Desligamento",
+    "Comissão dos vendedores > Novos vendedores"
+   ],
+   "ferramentas": [
+    "consultar_manual"
+   ],
+   "consultas_manual": [
+    {
+     "pergunta": "Qual a comissão do vendedor na venda de um HR-V?",
+     "trechos": 4,
+     "erro": null
+    }
+   ],
+   "erros_ferramentas": [],
+   "checagem": {
+    "fonte_consultada": true,
+    "palavras_ok": true,
+    "faltando": []
+   },
+   "nota": {
+    "fiel": true,
+    "correta": 2,
+    "justificativa": "A resposta identifica corretamente a categoria do veículo (SUV) e o percentual de comissão (1,2%) conforme o manual consultado, alinhando-se perfeitamente ao gabarito."
+   },
+   "tokens": 5350,
+   "latencia_ms": 35889
+  },
+  {
+   "id": "m08",
+   "tipo": "manual+banco",
+   "pergunta": "Quais lojas ganharam bônus de equipe em setembro de 2026, e de quanto por vendedor?",
+   "resposta": "Em setembro / 2026, as lojas que atingiram a meta foram Loja Centro (108,14 % de atingimento), Loja Norte (103,13 %) e Loja Serra (110,81 %). De acordo com a Política de metas e bônus, essas lojas recebem bônus de equipe: R$ 300,00 por vendedor nas lojas Centro e Norte, e R$ 600,00 por vendedor na loja Serra.",
+   "fontes": [
+    "Política de metas e bônus > Bônus de equipe",
+    "Política de metas e bônus > Como a meta é definida",
+    "Dados e relatórios: o que o sistema tem e o que não tem > O que o sistema comercial registra",
+    "Comissão dos vendedores > Pagamento"
+   ],
+   "ferramentas": [
+    "consultar_manual",
+    "executar_sql",
+    "executar_sql",
+    "executar_sql"
+   ],
+   "consultas_manual": [
+    {
+     "pergunta": "Quais lojas ganharam bônus de equipe em setembro de 2026, e de quanto por vendedor?",
+     "trechos": 4,
+     "erro": null
+    }
+   ],
+   "erros_ferramentas": [
+    "Erro no SQL: operator does not exist: date = integer"
+   ],
+   "checagem": {
+    "fonte_consultada": true,
+    "palavras_ok": true,
+    "faltando": []
+   },
+   "nota": {
+    "fiel": true,
+    "correta": 1,
+    "justificativa": "A resposta é fiel aos dados consultados, mas é parcialmente correta pois omite explicitamente as lojas que ficaram sem bônus (Sul e Litoral), o que está presente no gabarito."
+   },
+   "tokens": 15280,
+   "latencia_ms": 92454
+  },
+  {
+   "id": "m09",
+   "tipo": "manual+banco",
+   "pergunta": "A Loja Litoral precisa apresentar plano de ação à diretoria?",
+   "resposta": "A Loja Litoral ficou abaixo de 90 % da meta nos últimos três meses consecutivos (julho, agosto e setembro 2026). Segundo a Política de metas e bônus, isso obriga o gerente a apresentar um plano de ação à diretoria em até 15 dias.",
+   "fontes": [
+    "Política de metas e bônus > Plano de ação",
+    "Política de metas e bônus > Como a meta é definida",
+    "Lojas da rede > Loja Litoral (Cabo de Santo Agostinho)",
+    "Lojas da rede > Loja Sul (Jaboatão dos Guararapes)"
+   ],
+   "ferramentas": [
+    "consultar_manual",
+    "consultar_metrica"
+   ],
+   "consultas_manual": [
+    {
+     "pergunta": "Quando a Loja Litoral precisa apresentar plano de ação à diretoria?",
+     "trechos": 4,
+     "erro": null
+    }
+   ],
+   "erros_ferramentas": [],
+   "checagem": {
+    "fonte_consultada": true,
+    "palavras_ok": false,
+    "faltando": [
+     "sim"
+    ]
+   },
+   "nota": {
+    "fiel": true,
+    "correta": 2,
+    "justificativa": "A resposta confirma corretamente que a loja atingiu a condição de três meses consecutivos abaixo de 90% (julho, agosto e setembro de 2026, conforme dados do banco) e aplica a regra do manual de apresentar plano de ação em até 15 dias."
+   },
+   "tokens": 8584,
+   "latencia_ms": 29539
+  },
+  {
+   "id": "m10",
+   "tipo": "manual+banco",
+   "pergunta": "Por que dezembro é o mês em que mais vendemos?",
+   "resposta": "De acordo com os dados de vendas de 01/10/2024 a 30/09/2026, o mês de dezembro foi o que apresentou o maior número de unidades vendidas (377 unidades em 2025‑12 e 339 unidades em 2024‑12), superando todos os demais meses do período. Como o banco de dados contém apenas as métricas de vendas e não registra informações sobre campanhas, clima ou outras variáveis que possam explicar o desempenho, não é possível identificar a causa desse pico apenas com os dados disponíveis.",
+   "fontes": [],
+   "ferramentas": [
+    "consultar_metrica"
+   ],
+   "consultas_manual": [],
+   "erros_ferramentas": [],
+   "checagem": {
+    "fonte_consultada": false,
+    "palavras_ok": false,
+    "faltando": [
+     "fim de ano ou 13"
+    ]
+   },
+   "nota": {
+    "fiel": true,
+    "correta": 1,
+    "justificativa": "A resposta é fiel aos dados consultados (confirma que dezembro é o maior mês) e correta em recusar a causa sem base no manual, mas não fornece a explicação comercial presente no gabarito (13º, Natal, campanha), ficando parcial."
+   },
+   "tokens": 8255,
+   "latencia_ms": 27849
+  },
+  {
+   "id": "m11",
+   "tipo": "fora",
+   "pergunta": "Qual é a política de férias dos vendedores?",
+   "resposta": "Não há informação sobre a política de férias dos vendedores no manual da rede.",
+   "fontes": [
+    "Política de metas e bônus > Bônus de equipe",
+    "Comissão dos vendedores > Novos vendedores",
+    "Política de descontos > Limites por forma de pagamento",
+    "Política de metas e bônus > Como a meta é definida"
+   ],
+   "ferramentas": [
+    "consultar_manual"
+   ],
+   "consultas_manual": [
+    {
+     "pergunta": "Qual é a política de férias dos vendedores?",
+     "trechos": 4,
+     "erro": null
+    }
+   ],
+   "erros_ferramentas": [],
+   "checagem": {
+    "fonte_consultada": null,
+    "palavras_ok": true,
+    "faltando": []
+   },
+   "nota": {
+    "fiel": true,
+    "correta": 2,
+    "justificativa": "A resposta corretamente informa que o manual não contém regras sobre férias, alinhando-se ao gabarito e aos trechos consultados que tratam apenas de bônus, comissões e metas."
+   },
+   "tokens": 8280,
+   "latencia_ms": 45742
+  },
+  {
+   "id": "m12",
+   "tipo": "fora",
+   "pergunta": "Quanto a rede paga de comissão ao gerente da loja?",
+   "resposta": "Não há informação no manual da rede sobre comissão paga ao gerente da loja; o documento trata apenas da comissão e bônus dos vendedores.",
+   "fontes": [
+    "Comissão dos vendedores > Pagamento",
+    "Comissão dos vendedores > Comissão por veículo",
+    "Política de metas e bônus > Bônus de equipe",
+    "Comissão dos vendedores > Novos vendedores"
+   ],
+   "ferramentas": [
+    "consultar_manual"
+   ],
+   "consultas_manual": [
+    {
+     "pergunta": "Qual a comissão paga ao gerente da loja?",
+     "trechos": 4,
+     "erro": null
+    }
+   ],
+   "erros_ferramentas": [],
+   "checagem": {
+    "fonte_consultada": null,
+    "palavras_ok": true,
+    "faltando": []
+   },
+   "nota": {
+    "fiel": true,
+    "correta": 2,
+    "justificativa": "A resposta identifica corretamente a ausência de regras para gerentes no manual consultado, alinhando-se ao gabarito e aos trechos fornecidos."
+   },
+   "tokens": 8145,
+   "latencia_ms": 28074
+  }
+ ],
+ "modelo": "openai/gpt-oss-120b",
+ "resumo": {
+  "perguntas": 12,
+  "fonte_consultada": "8/10",
+  "palavras_ok": "10/12",
+  "juiz_fiel": "12/12",
+  "juiz_correta_2": "10/12",
+  "juiz_nota_media": 1.83
+ }
+}
