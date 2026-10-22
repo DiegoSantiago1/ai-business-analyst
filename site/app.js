@@ -8,13 +8,15 @@ const DICIONARIO = {
     "nav.problema": "Problem",
     "nav.como": "How it works",
     "nav.conversas": "Conversations",
+    "nav.manual": "Manual (RAG)",
     "nav.avaliacao": "Evaluation",
     "nav.seguranca": "Security",
     "nav.limites": "Limits",
-    "hero.sobre": "Project 5 · Applied AI for data",
-    "hero.titulo": "The manager asks in Portuguese.<br /><em>The AI queries the database and shows its work.</em>",
+    "hero.titulo": "Ask. <em>The AI shows its work.</em>",
     "hero.texto":
-      "An AI data analyst for a car dealership network (100% fictional data). The AI picks tools, queries PostgreSQL read-only and answers with checkable numbers: every value comes with the SQL that produced it.",
+      "An AI data analyst for a car dealership network (100% fictional data): the manager asks in Portuguese, the AI picks tools, queries PostgreSQL read-only and the sales manual, and answers with checkable numbers. Every value comes with the SQL that produced it.",
+    "hero.tela": "The real interface: the answer, the numbers checked against the database and the SQL that ran.",
+    "hero.telaAlt": "The chat interface: the question, the answer with verified numbers and the SQL that ran",
     "hero.ver": "See a real conversation",
     "hero.aoVivo": "Try it live",
     "hero.codigo": "Code on GitHub",
@@ -40,7 +42,22 @@ const DICIONARIO = {
     "como.n3": "tool calling, free tier",
     "como.n4t": "analista_ia user: SELECT only, on 7 views",
     "como.n4": "read-only transaction · 3 s per query · max 200 rows",
-    "como.ferr": "The AI's 4 tools",
+    "como.ferr": "The AI's 5 tools",
+    "como.f5": "Rules that are not in the database (bonuses, discount approval, targets), searched in the sales manual.",
+    "rag.titulo": "What is not in the database is in the manual",
+    "rag.lead": "\"How much does each salesperson earn above 110% of target?\" or \"who approves a 6% discount?\" are not database numbers. A fictional sales manual (9 documents, consistent with the data) answers through the consultar_manual tool, and the agent joins rule and number: \"which stores earned the team bonus in September?\".",
+    "rag.k1": "hit in the top 3 passages, across 26 retrieval questions",
+    "rag.n2": "0.825",
+    "rag.k2": "MRR of hybrid search (vector + Portuguese full-text), vs 0.800 with vectors only",
+    "rag.k3": "answers faithful to the manual (nothing invented), scored by a judge from another model family",
+    "rag.k4": "judge control tests: approve the answer keys and fail answers that are wrong on purpose",
+    "rag.c1t": "Search inside PostgreSQL",
+    "rag.c1": "pgvector and Portuguese full-text in one query, fused by Reciprocal Rank Fusion. Embeddings from a free local multilingual model.",
+    "rag.c2t": "Bigger was not better",
+    "rag.c2": "A 768-dimension embedding model scored MRR 0.754, below the 384 one, and indexed 10 times slower.",
+    "rag.c3t": "The evaluation caught my mistakes",
+    "rag.c3": "A prompt rule beat the manual rule, and two answer keys had wrong numbers. Fixed and measured again; 10 of 12 answers fully correct.",
+    "rag.nota": "Runs locally with Docker. The free cloud demo still runs without the manual (512 MB plan).",
     "como.f1":
       "Main path. 9 official metrics (revenue, average ticket, % of target…) with parameterized SQL: the right number by construction.",
     "como.f2": "Fallback for what the catalog does not cover. A single SELECT, behind 4 layers of defense.",
@@ -49,9 +66,9 @@ const DICIONARIO = {
     "conv.titulo": "Real conversations, step by step",
     "conv.lead":
       "Recorded from the official evaluation (unedited, in Portuguese). Pick a question and step through: the tool the AI called, the SQL that ran, what the database returned, and the answer.",
-    "aval.titulo": "Evaluation: 36 questions with known right answers",
+    "aval.titulo": "36 questions with an answer key",
     "aval.lead":
-      '"The AI answers well" only counts when measured. Each question has a reference SQL that produces the right answer; the evaluator (Python) asks through the API and checks. Patterns were planted in the fictional data on purpose: if the AI does not find them, it is wrong.',
+      '"The AI answers well" only counts when measured: the evaluation has 36 questions with a known right answer. Each question has a reference SQL that produces the right answer; the evaluator (Python) asks through the API and checks. Patterns were planted in the fictional data on purpose: if the AI does not find them, it is wrong.',
     "aval.grafico": "Correct answers by question type",
     "aval.todas": "See all 36 questions and each verdict",
     "aval.aprendeu": "What the evaluation caught — and what changed",
@@ -584,7 +601,7 @@ function renderHero() {
 function renderAvaliacao() {
   const r = dados.avaliacao.resumo;
   const tl = t().tiles;
-  const tile = (rot, val, sub) => el("div", { class: "tile" }, el("div", { class: "rot" }, rot), el("div", { class: "val" }, val), sub ? el("div", { class: "sub" }, sub) : null);
+  const tile = (rot, val, sub) => el("div", { class: "tile" }, el("div", { class: "val" }, val), el("div", { class: "rot" }, rot), sub ? el("div", { class: "sub" }, sub) : null);
   const tiles = [
     tile(tl.acerto, `${fmtDec(r.taxa_acerto, 0)}%`, `${r.acertos}/${r.perguntas}`),
     tile(tl.conferidos, `${fmtDec(r.numeros_conferidos_pct, 0)}%`, tl.conferidosSub),
@@ -854,6 +871,10 @@ function aplicarIdioma() {
     if (!no.dataset.pt) no.dataset.pt = no.innerHTML;
     // Texto fixo deste arquivo (não vem de dado externo): seguro como HTML.
     no.innerHTML = idioma === "en" ? DICIONARIO.en[no.dataset.i18nHtml] : no.dataset.pt;
+  }
+  for (const no of document.querySelectorAll("[data-i18n-alt]")) {
+    if (!no.dataset.ptAlt) no.dataset.ptAlt = no.alt;
+    no.alt = idioma === "en" ? (DICIONARIO.en[no.dataset.i18nAlt] ?? no.dataset.ptAlt) : no.dataset.ptAlt;
   }
   const botao = document.getElementById("idioma");
   botao.textContent = idioma === "en" ? "PT" : "EN";

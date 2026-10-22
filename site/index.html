@@ -37,6 +37,7 @@
           <a href="#problema" data-i18n="nav.problema">Problema</a>
           <a href="#como" data-i18n="nav.como">Como funciona</a>
           <a href="#conversas" data-i18n="nav.conversas">Conversas</a>
+          <a href="#manual" data-i18n="nav.manual">Manual (RAG)</a>
           <a href="#avaliacao" data-i18n="nav.avaliacao">Avaliação</a>
           <a href="#seguranca" data-i18n="nav.seguranca">Segurança</a>
           <a href="#limites" data-i18n="nav.limites">Limites</a>
@@ -51,13 +52,13 @@
     <main id="conteudo">
       <!-- ============================================================ HERO -->
       <section class="hero" id="inicio">
-        <div class="largura">
-          <p class="sobretitulo" data-i18n="hero.sobre">Projeto 5 · IA aplicada a dados</p>
-          <h1 data-i18n-html="hero.titulo">O gerente pergunta em português.<br /><em>A IA consulta o banco e mostra a conta.</em></h1>
+        <div class="largura hero-grade">
+          <div>
+          <h1 data-i18n-html="hero.titulo">Pergunte. <em>A IA mostra a conta.</em></h1>
           <p class="hero-texto" data-i18n="hero.texto">
-            Um analista de dados com IA para uma rede de concessionárias (dados 100% fictícios). A IA escolhe ferramentas,
-            consulta o PostgreSQL só para leitura e responde com números conferíveis: cada valor vem com o SQL que o
-            gerou.
+            Um analista de dados com IA para uma rede de concessionárias (dados 100% fictícios): o gerente pergunta em
+            português, a IA escolhe ferramentas, consulta o PostgreSQL só para leitura e o manual comercial, e responde com
+            números conferíveis. Cada valor vem com o SQL que o gerou.
           </p>
           <div class="kpis" id="kpis" aria-live="polite"></div>
           <div class="hero-acoes">
@@ -68,13 +69,17 @@
             >
           </div>
           <p class="hero-nota" id="nota-modelo"></p>
+          </div>
+          <figure class="hero-tela">
+            <img src="img/interface.webp" width="1128" height="1220" alt="A interface do chat: a pergunta, a resposta com os números conferidos e o SQL que rodou" data-i18n-alt="hero.telaAlt" />
+            <figcaption data-i18n="hero.tela">A interface de verdade: a resposta, os números conferidos contra o banco e o SQL que rodou.</figcaption>
+          </figure>
         </div>
       </section>
 
       <!-- ============================================================ PROBLEMA -->
       <section class="capitulo" id="problema">
         <div class="largura">
-          <p class="numero-cap">01</p>
           <h2 data-i18n="prob.titulo">O problema</h2>
           <p class="lead" data-i18n="prob.lead">
             Numa concessionária, o gerente quer resposta rápida: quem está abaixo da meta, quanto o consórcio cresceu,
@@ -109,7 +114,6 @@
       <!-- ============================================================ COMO FUNCIONA -->
       <section class="capitulo alt" id="como">
         <div class="largura">
-          <p class="numero-cap">02</p>
           <h2 data-i18n="como.titulo">Como funciona</h2>
           <p class="lead" data-i18n="como.lead">
             A IA não escreve SQL livremente por padrão: ela escolhe entre métricas oficiais, e a API monta o SQL com
@@ -140,8 +144,8 @@
               <span data-i18n="como.n4">transação somente leitura · 3 s por consulta · máx. 200 linhas</span>
             </div>
           </div>
-          <h3 class="subtitulo" data-i18n="como.ferr">As 4 ferramentas da IA</h3>
-          <div class="grade-4">
+          <h3 class="subtitulo" data-i18n="como.ferr">As 5 ferramentas da IA</h3>
+          <div class="grade-4 grade-5">
             <article class="cartao ferramenta">
               <code>consultar_metrica</code>
               <p data-i18n="como.f1">
@@ -158,6 +162,10 @@
               <p data-i18n="como.f3">Colunas e descrições das views, lidas dos comentários do próprio banco.</p>
             </article>
             <article class="cartao ferramenta">
+              <code>consultar_manual</code>
+              <p data-i18n="como.f5">Regras que não estão no banco (bônus, aprovação de desconto, metas), buscadas no manual comercial.</p>
+            </article>
+            <article class="cartao ferramenta">
               <code>responder</code>
               <p data-i18n="como.f4">
                 Resposta final estruturada. Cada número citado é procurado nos resultados do banco: achou = "conferido".
@@ -170,7 +178,6 @@
       <!-- ============================================================ CONVERSAS -->
       <section class="capitulo" id="conversas">
         <div class="largura">
-          <p class="numero-cap">03</p>
           <h2 data-i18n="conv.titulo">Conversas reais, passo a passo</h2>
           <p class="lead" data-i18n="conv.lead">
             Gravadas da avaliação oficial (sem edição). Escolha uma pergunta e avance pelos passos: a ferramenta que a IA
@@ -178,18 +185,50 @@
           </p>
           <div class="conversas">
             <div class="lista-conversas" role="tablist" aria-label="Conversas" id="lista-conversas"></div>
-            <div class="player" id="player" tabindex="0" aria-live="polite"></div>
+            <div class="player-moldura" data-ui><div class="player" id="player" tabindex="0" aria-live="polite"></div></div>
           </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ MANUAL (RAG) -->
+      <section class="capitulo" id="manual">
+        <div class="largura">
+          <h2 data-i18n="rag.titulo">O que não está no banco, está no manual</h2>
+          <p class="lead" data-i18n="rag.lead">
+            "Quanto cada vendedor ganha acima de 110% da meta?" ou "quem aprova um desconto de 6%?" não são números do banco.
+            Um manual comercial fictício (9 documentos, coerentes com os dados) responde pela ferramenta consultar_manual, e o
+            agente junta regra e número: "quais lojas ganharam o bônus de equipe em setembro?".
+          </p>
+          <div class="rag-numeros">
+            <div class="cartao"><strong>95%</strong><p data-i18n="rag.k1">acerto nos 3 primeiros trechos, em 26 perguntas de busca</p></div>
+            <div class="cartao"><strong data-i18n="rag.n2">0,825</strong><p data-i18n="rag.k2">MRR da busca híbrida (vetor + texto em português), contra 0,800 só com vetores</p></div>
+            <div class="cartao"><strong>12/12</strong><p data-i18n="rag.k3">respostas fiéis ao manual (nada inventado), notadas por um juiz de outra família de modelo</p></div>
+            <div class="cartao"><strong>11/11</strong><p data-i18n="rag.k4">testes de controle do juiz: aprovar os gabaritos e reprovar respostas erradas de propósito</p></div>
+          </div>
+          <div class="grade-3" style="margin-top:14px">
+            <article class="cartao">
+              <h3 data-i18n="rag.c1t">Busca no PostgreSQL</h3>
+              <p data-i18n="rag.c1">pgvector e o full-text em português numa consulta só, fundidos por Reciprocal Rank Fusion. Embeddings de um modelo multilíngue local, grátis.</p>
+            </article>
+            <article class="cartao">
+              <h3 data-i18n="rag.c2t">Maior não foi melhor</h3>
+              <p data-i18n="rag.c2">Um modelo de embeddings de 768 dimensões deu MRR 0,754, abaixo do de 384, e indexou 10 vezes mais devagar.</p>
+            </article>
+            <article class="cartao">
+              <h3 data-i18n="rag.c3t">A avaliação achou erro meu</h3>
+              <p data-i18n="rag.c3">Uma regra do prompt vencia a do manual, e dois gabaritos tinham números errados. Corrigidos e medidos de novo; 10 de 12 respostas totalmente corretas.</p>
+            </article>
+          </div>
+          <p class="nota" data-i18n="rag.nota">Roda localmente com Docker. A demonstração gratuita na nuvem segue sem o manual (plano de 512 MB).</p>
         </div>
       </section>
 
       <!-- ============================================================ AVALIAÇÃO -->
       <section class="capitulo alt" id="avaliacao">
         <div class="largura">
-          <p class="numero-cap">04</p>
-          <h2 data-i18n="aval.titulo">Avaliação: 36 perguntas com resposta certa conhecida</h2>
+          <h2 data-i18n="aval.titulo">36 perguntas com gabarito</h2>
           <p class="lead" data-i18n="aval.lead">
-            "A IA responde bem" só vale com número medido. Cada pergunta tem um SQL de referência que gera a resposta
+            "A IA responde bem" só vale com número medido: a avaliação tem 36 perguntas com resposta certa conhecida. Cada pergunta tem um SQL de referência que gera a resposta
             certa; o avaliador (Python) faz a pergunta pela API e confere. Os padrões foram plantados nos dados fictícios de
             propósito: se a IA não os encontra, ela errou.
           </p>
@@ -218,7 +257,6 @@
       <!-- ============================================================ SEGURANÇA -->
       <section class="capitulo" id="seguranca">
         <div class="largura">
-          <p class="numero-cap">05</p>
           <h2 data-i18n="seg.titulo">Segurança: defesa em 4 camadas</h2>
           <p class="lead" data-i18n="seg.lead">
             Uma checagem de texto na aplicação pode ser enganada por um SQL criativo; uma permissão do banco, não. Por isso
@@ -271,7 +309,6 @@
       <!-- ============================================================ LIMITES -->
       <section class="capitulo alt" id="limites">
         <div class="largura">
-          <p class="numero-cap">06</p>
           <h2 data-i18n="lim.titulo">Custos, limites e o que ainda não é bom</h2>
           <div class="duas-colunas">
             <div>
